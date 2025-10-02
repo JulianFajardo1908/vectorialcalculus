@@ -1,0 +1,14 @@
+^project\.Rproj$
+^\.Rproj\.user$
+^project\.Rcheck$
+^project.*\.tar\.gz$
+^project.*\.tgz$
+^LICENSE\.md$
+^vectorcalculus\.Rcheck$
+^vectorcalculus.*\.tar\.gz$
+^vectorcalculus.*\.tgz$
+^vectorialcalculus\.Rcheck$
+^vectorialcalculus.*\.tar\.gz$
+^vectorialcalculus.*\.tgz$
+^doc$
+^Meta$

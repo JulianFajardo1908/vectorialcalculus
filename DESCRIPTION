@@ -1,0 +1,37 @@
+Package: vectorialcalculus
+Type: Package
+Title: Tools for Vector Calculus in R
+Version: 0.1.0
+Authors@R: 
+    c(
+      person(given = "Julio", family = "Lizarazo Osorio",
+             role = "aut",
+             email = "julio.lizarazo@uptc.edu.co",
+             comment = c(affiliation = "Universidad Pedagógica y Tecnológica de Colombia (UPTC)")),
+      person(given = "Julian Mauricio", family = "Fajardo",
+             role = c("aut", "cre"),
+             email = "julian.fajardo@unbosque.edu.co",
+             comment = c(affiliation = "Universidad El Bosque"))
+    )
+Description: Functions for visualization and analysis in vector calculus:
+    parametric curves, scalar fields, and vector fields, including gradients,
+    divergences, curls, line and surface integrals, and 2D/3D pedagogical plots.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends: R (>= 4.1.0)
+Imports:
+    dplyr,
+    ggplot2,
+    purrr,
+    tibble, 
+    pracma
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+URL: https://github.com/tuusuario/vectorialcalculus
+BugReports: https://github.com/tuusuario/vectorialcalculus/issues
+LazyData: false

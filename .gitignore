@@ -1,0 +1,12 @@
+.Rproj.user
+inst/doc
+/doc/
+/Meta/
+.Rhistory
+.RData
+.httr-oauth
+.DS_Store
+.quarto
+vectorialcalculus.Rcheck/
+vectorialcalculus*.tar.gz
+vectorialcalculus*.tgz
