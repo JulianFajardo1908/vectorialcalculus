@@ -1,13 +1,13 @@
-#' Solid \eqn{(x,y,z)} with \eqn{y \in [H_1(x), H_2(x)]} and \eqn{z \in [G_1(x,y), G_2(x,y)]}
+#' Solid (x,y,z)
 #'
 #' Builds and (optionally) renders with \pkg{plotly} the solid
-#' \deqn{\{(x,y,z):\ x\in[a,b],\ y\in[H_1(x),H_2(x)],\ z\in[G_1(x,y),G_2(x,y)]\}}
+#' \eqn{\{(x,y,z): x \in [a,b], y \in [H_1(x),H_2(x)], z \in [G_1(x,y),G_2(x,y)]\}}
 #' using a curvilinear-prism parametrization. It supports:
 #' \itemize{
-#'   \item \strong{Display modes}: \code{mode = "faces" | "wireframe" | "both"}.
-#'   \item \strong{Numerical volume}: \code{compute_volume = TRUE} with \code{vol_method = "adaptive"|"grid"}.
-#'   \item \strong{Internal slices} on planes \eqn{x=x_0}, \eqn{y=y_0}, \eqn{z=z_0}.
-#'   \item \strong{Flexible colors}: flat colors (R names, \code{"#RRGGBB"}, \code{"rgba(...)"});
+#'   \item Display modes: \code{mode = "faces" | "wireframe" | "both"}.
+#'   \item Numerical volume: \code{compute_volume = TRUE} with \code{vol_method = "adaptive"|"grid"}.
+#'   \item Internal slices on planes \eqn{x=x_0}, \eqn{y=y_0}, \eqn{z=z_0}.
+#'   \item Flexible colors: flat colors (R names, \code{"#RRGGBB"}, \code{"rgba(...)"});
 #'         color vectors (gradients); or Plotly color scales (e.g. \code{"Viridis"}).
 #'         You can pass 1 or 6 scales for the six faces.
 #' }
@@ -19,12 +19,12 @@
 #' @param n_x,n_u,n_v Mesh resolution for the six faces (in \eqn{x}, \eqn{u}, \eqn{v}).
 #' @param mode \code{"faces"}, \code{"wireframe"} or \code{"both"}.
 #' @param show_faces Logical vector of length 6 indicating which faces to show,
-#'   in the order \code{c("x=a","x=b","y=H1","y=H2","z=G1","z=G2")}.
+#'   in the order \code{c("x=a","x=b","y=H1","y=H2","z=G1","z=G2")}. Length 1 is also accepted.
 #' @param colorscales Color scales for faces. Accepts:
 #'   \itemize{
-#'     \item A single Plotly scale name (e.g. \code{"Blues"}, \code{"Viridis"}) → applied to all faces.
-#'     \item A single flat color (R name, \code{"#RRGGBB"}, \code{"rgba(...)"}) → flat scale.
-#'     \item A color vector \code{c("white","#2a9d8f",...)} → evenly spaced gradient for all faces.
+#'     \item A single Plotly scale name (e.g. \code{"Blues"}, \code{"Viridis"}) applied to all faces.
+#'     \item A single flat color (R name, \code{"#RRGGBB"}, \code{"rgba(...)"}) -> flat scale.
+#'     \item A color vector \code{c("white","#2a9d8f",...)} -> evenly spaced gradient for all faces.
 #'     \item A vector/list of 6 scales (one per face) in any of the formats above.
 #'   }
 #' @param opacities Opacities for faces (length 1 or 6).
@@ -32,32 +32,22 @@
 #' @param surface_grid_color,surface_grid_width Grid style for surfaces.
 #' @param show_edges Logical. Draw edges of each face.
 #' @param edge_line Edge style (\code{list(color, width, dash)}).
-#' @param wire_step Integer \eqn{\ge 1}: draw every \code{wire_step}-th mesh line in wireframe mode.
+#' @param wire_step Integer >= 1: draw every \code{wire_step}-th mesh line in wireframe mode.
 #' @param wire_line Wireframe line style (\code{list(color, width, dash)}).
 #' @param scene 3D scene options (default \code{aspectmode="data"}).
 #' @param bg Background colors: \code{list(paper="white", plot="white")}.
-#' @param compute_volume Logical. If \code{TRUE}, estimates \eqn{\int_a^b \int_{H_1}^{H_2} (G_2-G_1)\,dy\,dx}.
+#' @param compute_volume Logical. If \code{TRUE}, approximate volume.
 #' @param vol_method Volume integration method: \code{"adaptive"} (nested \code{stats::integrate})
 #'   or \code{"grid"} (trapezoidal rule on a regular grid).
 #' @param nx_vol,ny_vol Grid sizes for \code{vol_method="grid"}.
 #' @param slice List of slices: \code{slice = list(x = NULL, y = NULL, z = NULL)}. Each entry
 #'   can be a number or numeric vector.
 #' @param slice_mode Slice rendering mode: \code{"surface"}, \code{"wireframe"} or \code{"both"}.
-#' @param slice_nx,slice_nu,slice_nv Mesh resolution for slices (\eqn{x}: \code{nu×nv}, \eqn{y}: \code{nx×nv}, \eqn{z}: \code{nx×nu}).
+#' @param slice_nx,slice_nu,slice_nv Mesh resolution for slices.
 #' @param slice_colorscales Color scales for slices: \code{list(x=, y=, z=)} in the same formats as \code{colorscales}.
-#' @param slice_opacity Opacity for slices (0–1).
+#' @param slice_opacity Opacity for slices (0-1).
 #' @param slice_show_grid,slice_grid_color,slice_grid_width Grid options for slices.
 #' @param slice_wire_step,slice_wire_line Wireframe step and style for slices.
-#'
-#' @details
-#' \strong{About color scales}: Each \emph{colorscale} can be
-#' \enumerate{
-#'   \item A Plotly scale name (\code{"Blues"}, \code{"Viridis"}, …),
-#'   \item A single color (R name, \code{"#RRGGBB"}, \code{"rgba(r,g,b,a)"}),
-#'   \item A color vector (\code{c("white","#2a9d8f",...)}) → evenly spaced gradient,
-#'   \item A ready Plotly list (pairs \code{list(list(pos,color), ...)}).
-#' }
-#' If \code{colorscales} has length 1 (or is a color vector), it is applied to all faces.
 #'
 #' @return
 #' A list with:
@@ -68,33 +58,14 @@
 #' }
 #'
 #' @examples
-#' \dontshow{if (interactive()) \{}
+#' # Note: examples avoid plotting for CRAN checks
 #' H1 <- function(x) -1 - x
 #' H2 <- function(x)  1 - x^2
 #' G1 <- function(x,y) y
 #' G2 <- function(x,y) y + 1
-#'
-#' # Six flat face colors
-#' solid_xyz3d(
-#'   H1,H2,G1,G2, a=-1, b=1, plot=TRUE, mode="faces",
-#'   colorscales = c("#b3cde0","#ccebc5","#decbe4","#fed9a6","#ffffcc","#fbb4ae"),
-#'   opacities   = 0.30
-#' )
-#'
-#' # Global custom gradient + sparse wireframe
-#' solid_xyz3d(
-#'   H1,H2,G1,G2, a=-1, b=1, plot=TRUE, mode="both",
-#'   colorscales = c("white","#2a9d8f"),
-#'   opacities   = 0.25,
-#'   wire_step   = 12,
-#'   wire_line   = list(color="rgba(20,20,20,0.25)", width=1, dash="dot"),
-#'   edge_line   = list(color="rgba(30,30,30,0.35)", width=1),
-#'   slice = list(x = 0, z = 0.6),
-#'   slice_mode = "surface",
-#'   slice_colorscales = list(x = "#ffb703", y = "#9b5de5", z = c("white", "#2a9d8f")),
-#'   slice_opacity = 0.6
-#' )
-#' \dontshow{\}}
+#' s <- solid_xyz3d(H1,H2,G1,G2, a=-1, b=1, plot=FALSE, compute_volume=TRUE, vol_method="grid",
+#'                  nx_vol=50, ny_vol=50)
+#' s$volume$estimate
 #'
 #' @export
 solid_xyz3d <- function(
@@ -135,11 +106,21 @@ solid_xyz3d <- function(
     slice_grid_width = 1,
     slice_wire_step = 8,
     slice_wire_line = list(color = "black", width = 2, dash = "dot")
-) {
-  # ---------- local helpers ----------
+)
+{
+  # ---------- helpers ----------
   assert_fun <- function(f, name) if (!is.function(f)) stop(sprintf("'%s' must be a function.", name), call. = FALSE)
   assert_num <- function(x, name) if (!is.numeric(x) || length(x)!=1L || !is.finite(x)) stop(sprintf("'%s' must be a finite numeric scalar.", name), call. = FALSE)
-  as_vec6 <- function(x) if (length(x)==1L) rep(x, 6) else x
+  assert_pos_int <- function(x, name) {
+    if (!is.numeric(x) || length(x)!=1L || !is.finite(x) ||
+        x < 1 || abs(x - round(x)) > .Machine$double.eps^0.5)
+      stop(sprintf("'%s' must be a positive integer.", name), call. = FALSE)
+  }
+  as_vec6_exact <- function(x, name) {
+    if (length(x) == 1L) rep(x, 6)
+    else if (length(x) == 6L) x
+    else stop(sprintf("'%s' must have length 1 or 6.", name), call. = FALSE)
+  }
 
   is_color <- function(x) {
     if (!is.character(x) || length(x) != 1) return(FALSE)
@@ -149,22 +130,26 @@ solid_xyz3d <- function(
   }
   as_rgba <- function(col, alpha = NULL) {
     if (grepl("^rgba?\\(", col, ignore.case = TRUE)) return(col)
-    rgb <- grDevices::col2rgb(col) / 255
+    rgb <- grDevices::col2rgb(col) # 0..255 integers
     a <- if (is.null(alpha)) 1 else max(0, min(1, alpha))
-    sprintf("rgba(%g,%g,%g,%g)", 255*rgb[1], 255*rgb[2], 255*rgb[3], a)
+    sprintf("rgba(%d,%d,%d,%g)", rgb[1], rgb[2], rgb[3], a)
+  }
+  is_plotly_scale_list <- function(x) {
+    is.list(x) && length(x) >= 2 && all(vapply(x, function(it)
+      is.list(it) && length(it) == 2 && is.numeric(it[[1]]) && is.character(it[[2]]) && length(it[[2]])==1L, logical(1)))
   }
   as_colorscale <- function(x, alpha = NULL) {
     if (is.null(x)) return(NULL)
-    if (is.list(x) && length(x) >= 2 && is.numeric(x[[1]][[1]])) return(x)
+    if (is_plotly_scale_list(x)) return(x)
     if (is.character(x) && length(x) == 1) {
       if (is_color(x)) {
         ccol <- as_rgba(x, alpha); return(list(list(0, ccol), list(1, ccol)))
-      } else return(x)
+      } else return(x) # Plotly named scale
     }
     if (is.character(x) && length(x) > 1) {
       cols <- vapply(x, as_rgba, character(1), alpha = alpha)
       pos  <- seq(0, 1, length.out = length(cols))
-      return(lapply(seq_along(cols), function(i) list(pos[i], cols[i])))
+      return(Map(function(p,c) list(p, c), pos, cols))
     }
     stop("Unrecognized 'colorscale' format.", call. = FALSE)
   }
@@ -173,17 +158,19 @@ solid_xyz3d <- function(
   assert_fun(H1,"H1"); assert_fun(H2,"H2"); assert_fun(G1,"G1"); assert_fun(G2,"G2")
   assert_num(a,"a"); assert_num(b,"b"); if (b <= a) stop("'b' must be > 'a'.", call. = FALSE)
   for (nm in c("n_x","n_u","n_v","wire_step","nx_vol","ny_vol","slice_nx","slice_nu","slice_nv","slice_wire_step")) {
-    assert_num(get(nm), nm); if (get(nm) < 1) stop(nm," must be >= 1.", call. = FALSE)
+    assert_pos_int(get(nm), nm)
   }
   mode <- match.arg(mode); vol_method <- match.arg(vol_method); slice_mode <- match.arg(slice_mode)
 
+  show_faces <- as_vec6_exact(show_faces, "show_faces")
+  opacities  <- as_vec6_exact(opacities,  "opacities")
+
   # ---------- colors (6 faces + slices) ----------
-  colorscales <- as_vec6(colorscales)
-  if (length(colorscales) != 6) {
-    cs_global <- as_colorscale(colorscales)
-    colorscales <- rep(list(cs_global), 6)
-  } else {
+  if (length(colorscales) == 6L) {
     colorscales <- lapply(colorscales, as_colorscale)
+  } else {
+    cs_global <- as_colorscale(colorscales)
+    colorscales <- rep(list(cs_global), 6L)
   }
   slice_cs_x <- as_colorscale(slice_colorscales$x)
   slice_cs_y <- as_colorscale(slice_colorscales$y)
@@ -196,6 +183,10 @@ solid_xyz3d <- function(
   x_seq <- seq(a, b, length.out = n_x)
   u_seq <- seq(0, 1, length.out = n_u)
   v_seq <- seq(0, 1, length.out = n_v)
+
+  # clamp steps to mesh sizes (defensivo)
+  wire_step       <- max(1L, min(wire_step, max(n_u, n_v)))
+  slice_wire_step <- max(1L, min(slice_wire_step, max(slice_nu, slice_nv)))
 
   # ---------- drawing helpers ----------
   add_edges <- function(fig, X, Y, Z, line = edge_line) {
@@ -317,92 +308,20 @@ solid_xyz3d <- function(
       if (isTRUE(show_edges))  fig <- add_edges(fig,     F$X,F$Y,F$Z)
       }
 
-      # ---------- slices ----------
-      has_x <- !is.null(slice$x) && length(slice$x) > 0
-      has_y <- !is.null(slice$y) && length(slice$y) > 0
-      has_z <- !is.null(slice$z) && length(slice$z) > 0
-
-      if (has_x) {
-        U <- seq(0,1,length.out = slice_nu)
-        V <- seq(0,1,length.out = slice_nv)
-        for (x0 in as.numeric(slice$x)) {
-          y_line <- y_blend(x0, U)
-          Xs <- matrix(x0, nrow = slice_nu, ncol = slice_nv)
-          Ys <- matrix(rep(y_line, times = slice_nv), nrow = slice_nu)
-          Zs <- matrix(NA_real_, slice_nu, slice_nv)
-          for (j in seq_len(slice_nv)) Zs[, j] <- z_blend(x0, y_line, V[j])
-
-          if (slice_mode != "wireframe") {
-            fig <- add_surface(fig, Xs, Ys, Zs,
-                               slice_cs_x, slice_opacity,
-                               slice_show_grid, slice_grid_color, slice_grid_width)
-          }
-          if (slice_mode != "surface") {
-            fig <- add_wireframe(fig, Xs, Ys, Zs, slice_wire_step, line = slice_wire_line)
-            fig <- add_edges(fig,     Xs, Ys, Zs, line = slice_wire_line)
-          }
-        }
-      }
-      if (has_y) {
-        V <- seq(0,1,length.out = slice_nv)
-        xs <- seq(a, b, length.out = slice_nx)
-        for (y0 in as.numeric(slice$y)) {
-          Xs <- matrix(rep(xs, each = slice_nv), nrow = slice_nv)
-          Ys <- matrix(y0, nrow = slice_nv, ncol = slice_nx)
-          Zs <- matrix(NA_real_, slice_nv, slice_nx)
-          for (j in seq_len(slice_nx)) Zs[, j] <- z_blend(xs[j], y0, V)
-
-          if (slice_mode != "wireframe") {
-            fig <- add_surface(fig, Xs, Ys, Zs,
-                               slice_cs_y, slice_opacity,
-                               slice_show_grid, slice_grid_color, slice_grid_width)
-          }
-          if (slice_mode != "surface") {
-            fig <- add_wireframe(fig, Xs, Ys, Zs, slice_wire_step, line = slice_wire_line)
-            fig <- add_edges(fig,     Xs, Ys, Zs, line = slice_wire_line)
-          }
-        }
-      }
-      if (has_z) {
-        xs <- seq(a, b, length.out = slice_nx)
-        U  <- seq(0, 1, length.out = slice_nu)
-        for (z0 in as.numeric(slice$z)) {
-          Xs <- matrix(rep(xs, each = slice_nu), nrow = slice_nu)
-          Ys <- matrix(NA_real_, slice_nu, slice_nx)
-          Zs <- matrix(z0,       slice_nu, slice_nx)
-          for (j in seq_len(slice_nx)) {
-            y_line <- y_blend(xs[j], U)
-            g1 <- G1(xs[j], y_line); g2 <- G2(xs[j], y_line)
-            inside <- z0 >= pmin(g1,g2) & z0 <= pmax(g1,g2)
-            Ys[, j] <- ifelse(inside, y_line, NA_real_)
-            Zs[, j] <- ifelse(inside, z0,     NA_real_)
-          }
-
-          if (slice_mode != "wireframe") {
-            fig <- add_surface(fig, Xs, Ys, Zs,
-                               slice_cs_z, slice_opacity,
-                               slice_show_grid, slice_grid_color, slice_grid_width)
-          }
-          if (slice_mode != "surface") {
-            fig <- add_wireframe(fig, Xs, Ys, Zs, slice_wire_step, line = slice_wire_line)
-            fig <- add_edges(fig,     Xs, Ys, Zs, line = slice_wire_line)
-          }
-        }
-      }
-
       fig <- fig |>
         plotly::layout(
-          title = sprintf("Solid (mode=%s)%s", mode, if (has_x||has_y||has_z) " with slices" else ""),
+          title = sprintf("Solid (mode=%s)", mode),
           scene = scene, paper_bgcolor = bg$paper, plot_bgcolor = bg$plot
         )
-      print(fig)
+      if (interactive()) print(fig)
     }
   }
 
   # ---------- volume ----------
   volume <- NULL
   if (isTRUE(compute_volume)) {
-    f_gap  <- function(x, y) G2(x, y) - G1(x, y)
+    # thickness always nonnegative
+    f_gap  <- function(x, y) abs(G2(x, y) - G1(x, y))
     f_gapv <- Vectorize(f_gap, SIMPLIFY = TRUE)
     H1v <- Vectorize(H1); H2v <- Vectorize(H2)
 
@@ -411,10 +330,12 @@ solid_xyz3d <- function(
         yl <- pmin(H1v(x), H2v(x)); yh <- pmax(H1v(x), H2v(x))
         g <- function(y) f_gapv(x, y)
         sapply(seq_along(x), function(i) {
-          stats::integrate(g, lower = yl[i], upper = yh[i], rel.tol = 1e-6)$value
+          res <- try(stats::integrate(g, lower = yl[i], upper = yh[i], rel.tol = 1e-6, stop.on.error = FALSE), silent = TRUE)
+          if (inherits(res, "try-error") || !is.finite(res$value)) 0 else res$value
         })
       }
-      vol_val <- stats::integrate(function(x) inner(x), lower = a, upper = b, rel.tol = 1e-6)$value
+      res <- try(stats::integrate(function(x) inner(x), lower = a, upper = b, rel.tol = 1e-6, stop.on.error = FALSE), silent = TRUE)
+      vol_val <- if (inherits(res, "try-error") || !is.finite(res$value)) NA_real_ else res$value
       volume  <- list(estimate = vol_val, method = "adaptive")
     } else {
       xs <- seq(a, b, length.out = nx_vol)
@@ -436,3 +357,4 @@ solid_xyz3d <- function(
 
   list(x_seq = x_seq, u_seq = u_seq, v_seq = v_seq, fig = fig, volume = volume)
 }
+

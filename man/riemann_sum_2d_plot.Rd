@@ -45,13 +45,13 @@ Controls which Riemann tiles are drawn. (All estimates are returned.)}
 
 \item{surface_colorscale}{Plotly colorscale for the true surface (e.g. \code{"Viridis"}).}
 
-\item{surface_opacity}{Opacity of the true surface (0–1).}
+\item{surface_opacity}{Opacity of the true surface (0-1).}
 
 \item{base_plane}{Logical; if \code{TRUE} draws a faint base plane at \code{z0}.}
 
 \item{z0}{Numeric; height of the base plane (typically 0).}
 
-\item{base_opacity}{Opacity of the base plane (0–1).}
+\item{base_opacity}{Opacity of the base plane (0-1).}
 
 \item{base_color}{Color of the base plane.}
 
@@ -61,7 +61,7 @@ Controls which Riemann tiles are drawn. (All estimates are returned.)}
 
 \item{grid_width}{Line width of the base grid.}
 
-\item{tile_opacity}{Opacity of Riemann tiles (0–1).}
+\item{tile_opacity}{Opacity of Riemann tiles (0-1).}
 
 \item{colors}{Named list for tile colors (hex or rgba), e.g.:
 \code{list(lower="#a1d99b", upper="#fc9272", mid="#9ecae1")}.}

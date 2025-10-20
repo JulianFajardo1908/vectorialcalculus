@@ -181,7 +181,7 @@ arc_length3d <- function(
       mode  = plot_mode,
       line  = plot_line,
       marker = plot_marker,
-      title = if (is.null(plot_title)) paste0("Arc length ∈ ", signif(length_val, 6)) else plot_title,
+      title = if (is.null(plot_title)) paste0("Arc length ~ ", signif(length_val, 6)) else plot_title,
       scene  = plot_scene,
       bg     = plot_bg
     ) |> print()

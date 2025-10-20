@@ -27,8 +27,8 @@
 #'
 #' @section Authors:
 #' \itemize{
-#'   \item Julio Lizarazo Osorio (\emph{Author}) — Universidad Pedagógica y Tecnológica de Colombia (UPTC).
-#'   \item Julian Mauricio Fajardo (\emph{Author, Maintainer}) — Universidad El Bosque.
+#'   \item Julio Lizarazo Osorio (\emph{Author}) - Universidad Pedagógica y Tecnológica de Colombia (UPTC).
+#'   \item Julian Mauricio Fajardo (\emph{Author, Maintainer}) - Universidad El Bosque.
 #' }
 #'
 #' @author
@@ -53,11 +53,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Example (sketch) — gradient of a simple scalar field:
+#' # Example (sketch) - gradient of a simple scalar field:
 #' f <- function(x, y, z) x^2 + y^2 + z
 #' # gradient(f, c("x","y","z"))  # assuming exported by the package
 #'
-#' # Visual aid (sketch) — plot a parametric curve and its tangent:
+#' # Visual aid (sketch) - plot a parametric curve and its tangent:
 #' # r <- function(t) cbind(sin(t), cos(t), t/5)
 #' # plot_curve3d(r, t = seq(0, 6*pi, length.out = 200))
 #' }

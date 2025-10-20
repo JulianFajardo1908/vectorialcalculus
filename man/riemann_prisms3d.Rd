@@ -2,7 +2,7 @@
 % Please edit documentation in R/riemann_prisms3d.R
 \name{riemann_prisms3d}
 \alias{riemann_prisms3d}
-\title{2D Riemann sums with rectangular 3D prisms (single function)}
+\title{Riemann rectangular prisms over a planar region}
 \usage{
 riemann_prisms3d(
   F,
@@ -34,50 +34,67 @@ riemann_prisms3d(
 )
 }
 \arguments{
-\item{F}{Integrand \code{function(x,y)}.}
+\item{F}{function \code{F(x,y)} returning a numeric scalar.}
 
-\item{f1, f2}{y-bounds: \code{function(x)}.}
+\item{f1, f2}{functions \code{f_i(x)}; lower/upper y-boundaries.}
 
-\item{a, b}{x-interval (with \code{b>a}).}
+\item{a, b}{Numeric x-interval endpoints \eqn{[a,b]} with \eqn{a \le b}.}
 
-\item{N, M}{Integers \code{>=1} (divisions in \code{x} and \code{y}).}
+\item{N, M}{integers > 0; number of cells in x and y.}
 
-\item{plot}{If \code{TRUE}, draw with \pkg{plotly}.}
+\item{plot}{logical; if \code{TRUE}, draw the prisms.}
 
-\item{estimate}{Which estimate to return: \code{"lower"}, \code{"upper"},
-\code{"mean"} or \code{"all"} (returns the three).}
+\item{estimate}{character; which estimate to compute (\code{"lower"}, \code{"upper"}, \code{"mean"}).}
 
-\item{sample_n}{Fine sampling per cell side (default \code{6}) to
-evaluate \code{lower}, \code{upper}, \code{mean}.}
+\item{sample_n}{integer; subgrid size per cell for mean/estimates.}
 
-\item{show_surface}{If \code{TRUE}, overlay the true surface \code{z = F(x,y)}.}
+\item{show_surface}{logical; draw the underlying surface \eqn{z = F(x,y)}.}
 
-\item{surface_colorscale, }{surface_opacity, show_surface_grid, surface_grid_color, surface_grid_width
-Aesthetics for the true surface.}
+\item{surface_colorscale}{character; Plotly colorscale for the surface (e.g., \code{"Viridis"}).}
 
-\item{color_by}{Which statistic colors the prism tops: \code{"lower"}, \code{"upper"}, \code{"mean"}.}
+\item{surface_opacity}{Numeric in \eqn{[0,1]}.}
 
-\item{top_colorscale}{Colorscale for prism tops (Plotly name, single color, or vector).}
+\item{show_surface_grid}{logical; show contour grid on the surface.}
 
-\item{top_opacity}{Top (ceiling) opacity (0–1).}
+\item{surface_grid_color}{character; color for surface grid lines.}
 
-\item{side_color, }{side_opacity Color/opacity for the 4 vertical sides.}
+\item{surface_grid_width}{numeric; width for surface grid lines.}
 
-\item{frame_color, }{frame_width Wireframe for prism edges (set \code{NA} to hide).}
+\item{color_by}{character; how to color prisms (\code{"value"}, \code{"height"}, etc.).}
 
-\item{scene, bg}{Plotly scene and backgrounds.}
+\item{top_colorscale}{character; colorscale for prism tops.}
+
+\item{top_opacity}{Numeric in \eqn{[0,1]}.}
+
+\item{side_color}{character; color for prism sides.}
+
+\item{side_opacity}{Numeric in \eqn{[0,1]}.}
+
+\item{frame_color}{character; color for cell frames.}
+
+\item{frame_width}{numeric; line width for frames.}
+
+\item{scene}{list; Plotly 3D scene options.}
+
+\item{bg}{list; background colors (\code{paper}, \code{plot}).}
 }
 \value{
-List with:
-\item \code{cells}: tibble with \code{x0,y0,hx,hy,z_lower,z_upper,z_mean}.
-\item \code{sum_lower}, \code{sum_upper}, \code{sum_mean}.
-\item \code{fig}: plotly object if \code{plot=TRUE}, else \code{NULL}.
+\describe{
+\item{\code{lower}}{Lower Riemann sum on the selected partition (if requested).}
+\item{\code{upper}}{Upper Riemann sum on the selected partition (if requested).}
+\item{\code{mean}}{Cellwise mean of \eqn{F} on the fine subgrid (if requested).}
+\item{\code{plot}}{Plotly object if \code{plot = TRUE}, else \code{NULL}.}
+}
 }
 \description{
-Approximates  ∬_Ω F(x,y) dx dy  with  Ω = {(x,y): a ≤ x ≤ b,
-min(f1(x),f2(x)) ≤ y ≤ max(f1(x),f2(x)) } using an N×M partition.
-For each valid cell it computes cellwise \code{lower}, \code{upper},
-and \code{mean} of F on a fine subgrid, and (optionally) draws
-\strong{rectangular prisms} with flat top (z constant on the cell) and
-vertical walls.
+Approximates \eqn{\iint_{\Omega} F(x,y)\,dx\,dy} over
+\eqn{\Omega = \{(x,y): a \le x \le b,\ \min(f_1(x), f_2(x)) \le y \le \max(f_1(x), f_2(x))\}}
+using an \eqn{N \times M} partition. For each valid cell it can draw
+\strong{rectangular prisms} with flat top (constant \eqn{z} per cell).
+}
+\examples{
+F <- function(x,y) x*y
+f1 <- function(x) 0; f2 <- function(x) 1 - x
+# riemann_prisms3d(F, a = 0, b = 1, f1, f2, N = 10, M = 10, plot = FALSE)
+
 }

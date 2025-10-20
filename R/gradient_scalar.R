@@ -1,15 +1,15 @@
-#' Gradient of a scalar field (with optional plot)
+#' Gradient of a 2D scalar field
 #'
-#' Computes the gradient of a scalar field f:R^n→R using central differences.
-#' If plot=TRUE, it will also plot the gradient vector at the evaluation point
-#' (supports 2D and 3D only).
+#' Computes the gradient vector ∇f(x,y) at a point (x0, y0).
 #'
-#' @param f Scalar field: function(x) with x numeric vector of length n.
-#' @param x0 Point where the gradient is evaluated (numeric vector).
-#' @param h Step size for finite differences. Default NULL → automatic.
-#' @param plot Logical. If TRUE and n=2 or 3, plot the gradient with plotly.
-#'
-#' @return Numeric vector with gradient components.
+#' @param f Function of two variables \code{f(x, y)}.
+#' @param x0 Numeric vector of length 2, the evaluation point.
+#' @param h Numeric step size for finite differences.
+#' @param plot Logical; if \code{TRUE}, draws the gradient with \pkg{plotly}.
+#' @return Numeric vector of length 2 with the gradient components.
+#' @examples
+#' f <- function(v) exp(-(v[1]^2 + v[2]^2)) + 0.3*sin(2*v[1]*v[2])
+#' gradient_scalar(f, c(0.6, -0.4))
 #' @export
 gradient_scalar <- function(f, x0, h = NULL, plot = FALSE) {
   if (!is.function(f)) stop("'f' must be a function(x).")

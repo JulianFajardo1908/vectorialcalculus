@@ -52,6 +52,6 @@ If NULL, they are inferred from the curve.}
 list(value=work, fig=plotly_or_NULL)
 }
 \description{
-Computes  ∫_a^b F(r(t))·r'(t) dt  and draws the curve together with arrows of F.
+Computes \eqn{\int_{a}^{b} F(\mathbf{r}(t)) \cdot \mathbf{r}'(t)\, dt} and draws the curve together with arrows of F.
 The arrow grid is fitted to the curve's bounding box unless you pass explicit ranges.
 }

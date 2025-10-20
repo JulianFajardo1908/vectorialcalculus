@@ -1,40 +1,40 @@
-#' Region on the plane z = z0 between y = H1(x) and y = H2(x)
+#' Planar region \eqn{\{(x,y): a \le x \le b,\ H_1(x) \le y \le H_2(x)\}} drawn at height \eqn{z_0}
 #'
-#' Translation of WxMaxima block \code{region_xyz0(...)}.
-#' It draws the region \eqn{\{(x,y,z_0): x\in[a,b],\, \min(H_1(x),H_2(x)) \le y \le \max(H_1(x),H_2(x))\}}
-#' and places vertical partitions every \eqn{D} (using \eqn{n=\lceil(b-a)/D\rceil}).
-#' Internally it delegates to \code{region_xy()} with \code{as_3d=TRUE}.
+#' Builds the planar region
+#' \deqn{\Omega = \{(x,y):\ a \le x \le b,\ H_1(x) \le y \le H_2(x)\}}
+#' and renders it as a thin patch on the plane \eqn{z = z_0}. Optionally draws
+#' the boundary curves, partition lines along \eqn{x}, and a surface patch.
 #'
-#' @param H1,H2 \code{function(x)} defining the lower/upper boundaries in \code{y}.
-#' @param a,b Endpoints in \code{x} (with \code{b > a}).
-#' @param z0 Height of the plane \eqn{z=z_0}.
-#' @param D Target spacing between partitions (\eqn{n=\lceil (b-a)/D\rceil}).
-#' @param plot \code{TRUE}/\code{FALSE}. If \code{TRUE}, draw with \pkg{plotly}.
-#' @param n_curve Number of samples for \code{H1}, \code{H2}.
-#' @param show_surface \code{TRUE}/\code{FALSE}. If \code{TRUE}, fills the region as a faint surface on \eqn{z=z_0}.
-#' @param surface_colorscale Plotly colorscale for the fill (if \code{show_surface=TRUE}).
-#' @param surface_opacity Fill opacity (0–1).
-#' @param show_surface_grid \code{TRUE}/\code{FALSE} grid over the filled surface.
-#' @param surface_grid_color,surface_grid_width Grid style for the filled surface.
-#' @param boundary_line Line style for boundary curves (\code{list(color, width, dash)}).
-#' @param partition_line Line style for the vertical partitions.
-#' @param show_end_edges \code{TRUE}/\code{FALSE} to also include \eqn{x=a} and \eqn{x=b}.
-#' @param scene 3D scene settings (default \code{aspectmode="data"}).
-#' @param bg Background colors: \code{list(paper="white", plot="white")}.
+#' @param H1,H2 Functions \code{H_i(x)}; lower/upper \eqn{y}-boundaries.
+#' @param a,b Numeric scalars; \eqn{x}-interval endpoints with \eqn{a \le b}.
+#' @param z0 Numeric; height of the display plane \eqn{z = z_0}.
+#' @param D Integer \eqn{> 0}; number of \eqn{x}-partitions (controls vertical “slices” and grid density).
+#' @param plot Logical; if \code{TRUE}, draw the region with \pkg{plotly}.
+#' @param n_curve Integer; samples used to trace each boundary curve \eqn{y = H_i(x)}.
+#' @param show_surface Logical; if \code{TRUE}, draw a thin surface patch of the region at \eqn{z=z_0}.
+#' @param surface_colorscale Character; Plotly colorscale for the surface patch (e.g., \code{"Blues"}).
+#' @param surface_opacity Numeric in \eqn{[0,1]}; opacity of the surface patch.
+#' @param show_surface_grid Logical; show grid/contours on the surface patch.
+#' @param surface_grid_color Character; color for surface grid lines.
+#' @param surface_grid_width Numeric; width for surface grid lines.
+#' @param boundary_line List; style for the boundary polylines (e.g., \code{list(color="blue", width=2)}).
+#' @param partition_line List; style for the partition lines at \eqn{x = a + k(b-a)/D}.
+#' @param show_end_edges Logical; draw edges at \eqn{x=a} and \eqn{x=b}.
+#' @param scene List; Plotly 3D scene options.
+#' @param bg List with \code{paper} and \code{plot} background colors.
 #'
-#' @return The same list returned by \code{region_xy()}:
-#' \itemize{
-#'   \item \code{x}, \code{y1}, \code{y2}, \code{y_low}, \code{y_high}
-#'   \item \code{x_part} (partition positions)
-#'   \item \code{fig} (plotly object if \code{plot=TRUE}, otherwise \code{NULL})
+#' @return
+#' \describe{
+#'   \item{\code{data}}{A list (or tibble, según implementación) con las muestras de las curvas y/o la malla usada.}
+#'   \item{\code{plot}}{Un objeto \pkg{plotly} si \code{plot = TRUE}, de lo contrario \code{NULL}.}
 #' }
 #'
 #' @examples
-#' H1 <- function(x) sin(x) - 0.3
-#' H2 <- function(x) 0.8 + 0.2*cos(2*x)
-#' region_xyz0(H1, H2, a = 0, b = 2*pi, z0 = 1, D = 0.5,
-#'             plot = TRUE, show_surface = TRUE,
-#'             surface_colorscale = "Blues", surface_opacity = 0.30)
+#' H1 <- function(x) 0
+#' H2 <- function(x) 1 - x
+#' # Región bajo H2 y sobre H1 en [0,1], dibujada en z = 0
+#' # region_xyz0(H1, H2, a = 0, b = 1, z0 = 0, D = 20, plot = TRUE, show_surface = TRUE)
+#'
 #' @export
 region_xyz0 <- function(
     H1, H2,
@@ -56,9 +56,6 @@ region_xyz0 <- function(
       aspectmode = "data",
       xaxis = list(title = "x"),
       yaxis = list(title = "y"),
-#' @noRd
-#' @noRd
-#' @noRd
       zaxis = list(title = "z")
     ),
     bg = list(paper = "white", plot = "white")

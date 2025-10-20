@@ -1,51 +1,35 @@
-#' Region in the xy–plane between two curves y = H1(x), y = H2(x) (2D or 3D)
+#' Planar region between two curves y = H1(x) and y = H2(x)
 #'
-#' For \eqn{x \in [a,b]}, this plots the curves \eqn{y = H_1(x)} and \eqn{y = H_2(x)},
-#' the vertical partitions every \eqn{D} (using \eqn{n=\lceil(b-a)/D\rceil}),
-#' and optionally fills the region. With \code{as_3d=TRUE}, it draws the scene
-#' in 3D over the plane \eqn{z=\texttt{plane\_z}} (useful to combine with other surfaces).
+#' @description
+#' Builds the region \eqn{\{(x,y): a \le x \le b,\ H_1(x) \le y \le H_2(x)\}} and (optionally) plots it.
 #'
-#' @param H1,H2 \code{function(x)}.
-#' @param a,b Endpoints of the interval in \eqn{x}.
-#' @param D Desired step between vertical partitions (we use \eqn{n=\lceil (b-a)/D\rceil}).
-#' @param plot \code{TRUE}/\code{FALSE}. If \code{TRUE}, draw with \pkg{plotly}.
-#' @param n_curve Integer, number of samples for the curves.
-#' @param fill \code{TRUE}/\code{FALSE}. If \code{TRUE}, fill the region.
-#' @param fillcolor (2D) Fill color (rgba or simple color).
-#' @param boundary_line Line style for the boundary curves.
-#' @param partition_line Line style for the vertical partitions.
-#' @param show_end_edges \code{TRUE}/\code{FALSE} to also include \eqn{x=a} and \eqn{x=b}.
-#' @param axis_equal (2D) \code{TRUE}/\code{FALSE} to use the same scale in x and y.
-#' @param as_3d \code{TRUE}/\code{FALSE} to draw in 3D over \code{plane_z}.
-#' @param plane_z Height of the \eqn{z}-plane (default 0).
-#' @param n_u (3D) “Transverse” resolution for the filled surface.
-#' @param surface_colorscale (3D) Plotly colorscale for the fill (e.g., "Blues").
-#' @param surface_opacity (3D) Opacity of the fill (0–1).
-#' @param show_surface_grid (3D) \code{TRUE}/\code{FALSE} grid over the filled surface.
-#' @param surface_grid_color,surface_grid_width (3D) Aesthetics of that grid.
-#' @param scene (3D) Scene settings (default \code{aspectmode="data"}).
-#' @param bg (3D) Background colors \code{list(paper="white", plot="white")}.
+#' @param H1,H2 functions \code{H_i(x)}; lower/upper y-boundaries.
+#' @param a,b numeric; x-interval endpoints with \eqn{a \le b}.
+#' @param D integer > 0; number of x-subdivisions (default \code{200}).
+#' @param plot logical; if \code{TRUE}, draw the region with \pkg{plotly}.
+#' @param show_surface_grid logical; show grid/contours on the plotted surface.
+#' @param surface_grid_color character; color for surface grid lines.
+#' @param surface_grid_width numeric; width for surface grid lines.
+#' @param scene list; Plotly 3D scene options.
+#' @param bg list; background colors (\code{paper}, \code{plot}).
+#' @param n_curve Integer; puntos para muestrear cada curva.
+#' @param fill Logical; rellenar la región (2D) si \code{TRUE}.
+#' @param fillcolor Character; color de relleno (2D).
+#' @param boundary_line List; estilo de la frontera \code{y = H1, H2}.
+#' @param partition_line List; estilo de las líneas de partición.
+#' @param show_end_edges Logical; mostrar bordes en los extremos \code{x=a,b}.
+#' @param axis_equal Logical; usar aspecto igual en 2D.
+#' @param as_3d Logical; dibujar en 3D (superficie) si \code{TRUE}.
+#' @param plane_z Numeric; altura \code{z} de la “lámina” si \code{as_3d = TRUE}.
+#' @param n_u Integer; subdivisiones internas para discretización.
+#' @param surface_colorscale Character; colorscale (3D).
+#' @param surface_opacity Numeric in \eqn{[0,1]}; opacidad (3D).
 #'
-#' @return A list with:
-#' \itemize{
-#'   \item \code{x}, \code{y1}, \code{y2}, \code{y_low}, \code{y_high}
-#'   \item \code{x_part} (partition positions)
-#'   \item \code{fig} (plotly object if \code{plot=TRUE}, otherwise \code{NULL})
-#' }
+#' @return A list with the grid data (and a Plotly object if \code{plot = TRUE}).
 #'
 #' @examples
-#' H1 <- function(x) sin(x) - 0.3
-#' H2 <- function(x) 0.8 + 0.2*cos(2*x)
-#'
-#' # Classic 2D:
-#' xy_region(H1, H2, a = 0, b = 2*pi, D = 0.5,
-#'           plot = TRUE, fill = TRUE)
-#'
-#' # 3D over z=0 (very light filled surface):
-#' xy_region(H1, H2, a = 0, b = 2*pi, D = 0.5,
-#'           plot = TRUE, as_3d = TRUE, fill = TRUE,
-#'           surface_colorscale = "Blues", surface_opacity = 0.30,
-#'           show_surface_grid = TRUE)
+#' H1 <- function(x) 0; H2 <- function(x) 1 - x
+#' xy_region(H1, H2, a = 0, b = 1, D = 200, plot = FALSE)
 #'
 #' @export
 xy_region <- function(
@@ -71,9 +55,6 @@ xy_region <- function(
     scene = list(
       aspectmode = "data",
       xaxis = list(title = "x"),
-#' @noRd
-#' @noRd
-#' @noRd
       yaxis = list(title = "y"),
       zaxis = list(title = "z")
     ),

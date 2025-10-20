@@ -46,9 +46,9 @@ a scalar, or a numeric vector of length \eqn{n}.}
 
 \item{tol_eig}{Eigenvalue tolerance for classification (positive/negative vs. near-zero).}
 
-\item{maxit}{Max iterations per \code{optim()} call.}
+\item{maxit}{Max iterations per \code{stats::optim()} call.}
 
-\item{optim_method}{Primary method for \code{optim()} (\code{"BFGS"} or \code{"Nelder-Mead"}).
+\item{optim_method}{Primary method for \code{stats::optim()} (\code{"BFGS"} or \code{"Nelder-Mead"}).
 If it errors, a fallback to \code{"Nelder-Mead"} is used.}
 
 \item{seed}{Optional integer seed for reproducibility of random starts.}

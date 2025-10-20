@@ -1,29 +1,46 @@
-#' Osculating ribbon of a space curve r(t)
+#' Osculating ribbon along a 3D curve
 #'
-#' For each \eqn{t \in [a,b]}, constructs the segment from \eqn{r(t)}
-#' to the center of the osculating circle
-#' \eqn{C(t) = r(t) + N(t)/\kappa(t)} and generates the
-#' \strong{ruled surface}:
-#' \deqn{S(t,u) = r(t) + u\,\frac{N(t)}{\kappa(t)},\quad u\in[0,u_{\max}].}
+#' Constructs and (optionally) plots a narrow ribbon that follows a spatial
+#' parametric curve \eqn{\mathbf{r}(t) = (x(t), y(t), z(t))}, based on its Frenet
+#' frame \eqn{(\mathbf{T}, \mathbf{N}, \mathbf{B})}. The ribbon extends a small
+#' distance along the normal direction, forming a “band” that visualizes
+#' curvature and torsion.
 #'
-#' @param X,Y,Z Functions \code{x(t)}, \code{y(t)}, \code{z(t)}.
-#' @param a,b Endpoints of the interval \code{[a,b]}.
-#' @param h Step size for centered finite differences.
-#' @param plot Logical; if \code{TRUE}, draws with \pkg{plotly}.
-#' @param n_t,n_u Resolution in \code{t} and \code{u}.
-#' @param u_max Fraction of the radius \eqn{R(t)} to draw (\code{0 < u_max <= 1}). Default \code{1}.
-#' @param colorscale Plotly colorscale for the ribbon.
-#' @param opacity Opacity of the ribbon (0–1).
-#' @param show_curve Logical; draw the curve \eqn{r(t)}.
-#' @param show_centers Logical; draw the centers \eqn{C(t)}.
-#' @param curve_line,centers_line Line styles.
-#' @param show_surface_grid Logical; mesh grid over the surface.
-#' @param surface_grid_color,surface_grid_width Aesthetics of the surface grid.
-#' @param show_axis_grid Logical; axis grids.
-#' @param scene,bg,lighting Scene, background, and lighting settings.
-#' @param tol Numerical tolerance (curvature ~ 0).
+#' @param X,Y,Z Functions of \code{t} returning \eqn{x(t)}, \eqn{y(t)}, \eqn{z(t)}.
+#' @param a,b Numeric scalars; interval endpoints for \eqn{t \in [a,b]}.
+#' @param h Numeric step for finite differences (default \code{1e-4}).
+#' @param plot Logical; if \code{TRUE}, draws the ribbon using \pkg{plotly}.
+#' @param n_t Integer; number of samples along the base curve.
+#' @param n_u Integer; subdivisions across the ribbon width.
+#' @param u_max Numeric; half-width of the ribbon (in normal direction units).
+#' @param colorscale Character; Plotly colorscale for the ribbon (default \code{"Blues"}).
+#' @param opacity Numeric in \eqn{[0,1]}; ribbon opacity.
+#' @param show_curve Logical; draw the base curve \eqn{\mathbf{r}(t)}.
+#' @param show_centers Logical; draw the centerline joining ribbon midpoints.
+#' @param curve_line List; style for the base curve (e.g., \code{list(color="black", width=2)}).
+#' @param centers_line List; style for the centerline (e.g., \code{list(color="red", width=2)}).
+#' @param show_surface_grid Logical; show contour grid on the ribbon surface.
+#' @param surface_grid_color Character; color of the grid lines.
+#' @param surface_grid_width Numeric; width of the grid lines.
+#' @param show_axis_grid Logical; show axis background gridlines.
+#' @param scene List; Plotly 3D scene configuration.
+#' @param bg List; background colors (\code{paper}, \code{plot}).
+#' @param lighting List; Plotly lighting options for the surface.
+#' @param tol Numeric tolerance used for normalizations and zero checks.
 #'
-#' @return \code{list} with \code{t_seq, u_seq, Xmat, Ymat, Zmat, curve, centers}.
+#' @return
+#' \describe{
+#'   \item{\code{data}}{List or tibble with \code{t}, base curve coordinates,
+#'     and frame vectors \code{T, N, B}.}
+#'   \item{\code{plot}}{Plotly object if \code{plot = TRUE}, else \code{NULL}.}
+#' }
+#'
+#' @examples
+#' X <- function(t) cos(t)
+#' Y <- function(t) sin(t)
+#' Z <- function(t) 0.2 * t
+#' # osculating_ribbon3d(X, Y, Z, a = 0, b = 4*pi, plot = TRUE)
+#'
 #' @export
 osculating_ribbon3d <- function(
     X, Y, Z,
@@ -48,12 +65,7 @@ osculating_ribbon3d <- function(
       xaxis = list(title = "x(t)"),
       yaxis = list(title = "y(t)"),
       zaxis = list(title = "z(t)")
-#' @noRd
-#' @noRd
     ),
-#' @noRd
-#' @noRd
-#' @noRd
     bg = list(paper = "white", plot = "white"),
     lighting = list(ambient = 1, diffuse = 0.15, specular = 0, roughness = 1, fresnel = 0),
     tol = 1e-10

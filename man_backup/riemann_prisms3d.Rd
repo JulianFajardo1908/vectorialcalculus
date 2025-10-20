@@ -68,16 +68,18 @@ Aesthetics for the true surface.}
 \item{scene, bg}{Plotly scene and backgrounds.}
 }
 \value{
-List with:
-\item \code{cells}: tibble with \code{x0,y0,hx,hy,z_lower,z_upper,z_mean}.
-\item \code{sum_lower}, \code{sum_upper}, \code{sum_mean}.
-\item \code{fig}: plotly object if \code{plot=TRUE}, else \code{NULL}.
+\describe{
+  \item{lower}{Lower Riemann sum on the selected partition.}
+  \item{upper}{Upper Riemann sum on the selected partition.}
+  \item{mean}{Cellwise mean of \eqn{F} on the fine subgrid.}
+}
 }
 \description{
-Approximates  ∬_Ω F(x,y) dx dy  with  Ω = {(x,y): a ≤ x ≤ b,
-min(f1(x),f2(x)) ≤ y ≤ max(f1(x),f2(x)) } using an N×M partition.
-For each valid cell it computes cellwise \code{lower}, \code{upper},
-and \code{mean} of F on a fine subgrid, and (optionally) draws
-\strong{rectangular prisms} with flat top (z constant on the cell) and
-vertical walls.
+Approximates \eqn{\iint_{\Omega} F(x,y)\,dx\,dy} over
+\eqn{\Omega = \{(x,y): a \le x \le b,\ \min(f_1(x), f_2(x)) \le y \le \max(f_1(x), f_2(x))\}}
+using an \eqn{N \times M} partition.
+For each valid cell, it computes the cellwise \code{lower}, \code{upper}, and \code{mean} of
+\eqn{F} on a fine subgrid, and (optionally) draws \strong{rectangular prisms} with a flat
+top (constant \eqn{z} on the cell) and vertical walls.
 }
+

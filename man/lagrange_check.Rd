@@ -28,11 +28,11 @@ A list with:
 \item \code{ok_stationarity}: norm of KKT residual \eqn{\|\nabla f - J^\top\lambda\|}.
 \item \code{ok_feasible}: \eqn{\max_i |g_i(x)|}.
 \item \code{lambda}: Lagrange multipliers \eqn{\lambda} (length m).
-\item \code{J}: Jacobian (m×n).
-\item \code{H_f}: Hessian of \eqn{f} (n×n).
-\item \code{H_g}: list of Hessians \eqn{H_{g_i}} (each n×n).
-\item \code{H_L}: Hessian of the Lagrangian (n×n).
-\item \code{B}: bordered Hessian ( (m+n)×(m+n) ).
+\item \code{J}: Jacobian (m\eqn{\times}n).
+\item \code{H_f}: Hessian of \eqn{f} (n\eqn{\times}n).
+\item \code{H_g}: list of Hessians \eqn{H_{g_i}} (each n\eqn{\times}n).
+\item \code{H_L}: Hessian of the Lagrangian (n\eqn{\times}n).
+\item \code{B}: bordered Hessian ( (m+n)\eqn{\times}(m+n) ).
 \item \code{minors}: \code{data.frame} with \eqn{\Delta_k}, its \code{sign} and \code{logAbsDet}.
 \item \code{clasificacion}: \code{"minimo"}, \code{"maximo"} or \code{"indeterminado"}.
 \item \code{notas}: notes about \eqn{rank(J)}, near-singularity, etc.
@@ -46,7 +46,7 @@ using the signs of the \emph{leading principal minors}.
 }
 \details{
 Let \eqn{f:\mathbb{R}^n\to\mathbb{R}} and \eqn{g:\mathbb{R}^n\to\mathbb{R}^m}.
-At \eqn{x^\*}, with Jacobian \eqn{J = \nabla g(x^\*)} (m×n) and
+At \eqn{x^\*}, with Jacobian \eqn{J = \nabla g(x^\*)} (m\eqn{\times}n) and
 \eqn{H_f = \nabla^2 f(x^\*)}, \eqn{H_{g_i} = \nabla^2 g_i(x^\*)}, the Hessian of
 the Lagrangian is \eqn{H_L = H_f - \sum_{i=1}^m \lambda_i H_{g_i}}, where
 \eqn{\lambda} satisfies \eqn{\nabla f(x^\*) = J^\top \lambda}. The \strong{bordered Hessian} is

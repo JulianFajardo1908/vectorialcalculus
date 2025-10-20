@@ -223,7 +223,7 @@ line_integral2d <- function(
           showlegend = FALSE
         ) |>
         plotly::layout(
-          title = sprintf("Line integral (value ≈ %.6g)", value),
+          title = sprintf("Line integral (value \u2248 %.6g)", value),
           scene = scene,
           paper_bgcolor = bg$paper,
           plot_bgcolor  = bg$plot

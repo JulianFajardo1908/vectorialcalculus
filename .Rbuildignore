@@ -12,3 +12,9 @@
 ^vectorialcalculus.*\.tgz$
 ^doc$
 ^Meta$
+^man_backup$
+^line_integral_2d_gganimate\.gif$
+^Curvas3D_visuales\.Rmd$
+^Curvas_param_R\.Rmd$
+^Curvas_param_R\.html$
+^vignettes/Prueba1\.Rmd$

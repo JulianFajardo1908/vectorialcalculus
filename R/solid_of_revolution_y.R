@@ -169,7 +169,7 @@ solid_of_revolution_y <- function(
           type = "scatter3d", mode = "lines",
           line = list(color = colors$curve %||% "firebrick", width = curve_width),
           opacity = curve_opacity,
-          name = sprintf("profile f(x) @ θ = %.2f rad", th),
+          name = sprintf("profile f(x) @ \u03B8 = %.2f rad", th),
           showlegend = TRUE, inherit = FALSE
         )
       }

@@ -17,15 +17,15 @@
 #' @param show_surface Logical; if \code{TRUE} overlays the true surface \eqn{z=f(x,y)}.
 #' @param surface_res Integer vector \code{c(nx_s, ny_s)} for the surface mesh.
 #' @param surface_colorscale Plotly colorscale for the true surface (e.g. \code{"Viridis"}).
-#' @param surface_opacity Opacity of the true surface (0–1).
+#' @param surface_opacity Opacity of the true surface (0-1).
 #' @param base_plane Logical; if \code{TRUE} draws a faint base plane at \code{z0}.
 #' @param z0 Numeric; height of the base plane (typically 0).
-#' @param base_opacity Opacity of the base plane (0–1).
+#' @param base_opacity Opacity of the base plane (0-1).
 #' @param base_color Color of the base plane.
 #' @param show_base_grid Logical; if \code{TRUE} draws partition grid lines on the base plane.
 #' @param grid_color Color of the base grid lines.
 #' @param grid_width Line width of the base grid.
-#' @param tile_opacity Opacity of Riemann tiles (0–1).
+#' @param tile_opacity Opacity of Riemann tiles (0-1).
 #' @param colors Named list for tile colors (hex or rgba), e.g.:
 #'   \code{list(lower="#a1d99b", upper="#fc9272", mid="#9ecae1")}.
 #' @param edge_color Edge color for vertical edges of tiles.

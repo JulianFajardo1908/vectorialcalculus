@@ -135,7 +135,7 @@ You can pass 1 or 6 scales for the six faces.
 \details{
 \strong{About color scales}: Each \emph{colorscale} can be
 \enumerate{
-\item A Plotly scale name (\code{"Blues"}, \code{"Viridis"}, …),
+\item A Plotly scale name (\code{"Blues"}, \code{"Viridis"}),
 \item A single color (R name, \code{"#RRGGBB"}, \code{"rgba(r,g,b,a)"}),
 \item A color vector (\code{c("white","#2a9d8f",...)}) → evenly spaced gradient,
 \item A ready Plotly list (pairs \code{list(list(pos,color), ...)}).

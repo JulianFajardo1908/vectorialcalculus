@@ -44,11 +44,17 @@ controls which rectangles are drawn. All estimates are always returned.}
 
 \item{edge_color}{Rectangle border color; \code{edge_width} its width.}
 
+\item{edge_width}{Numeric width for bar edges.}
+
 \item{curve_color, curve_width}{Style for the true curve.}
 
 \item{show_baseline}{Logical; draw a horizontal baseline at \code{baseline}.}
 
 \item{baseline}{Baseline y-value (default 0); \code{baseline_color}, \code{baseline_width} style it.}
+
+\item{baseline_color}{Color for the baseline (y=0).}
+
+\item{baseline_width}{Numeric width for the baseline.}
 
 \item{warn_heavy}{Warn if \code{n} is large (many polygons).}
 }

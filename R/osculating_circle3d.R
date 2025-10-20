@@ -1,39 +1,50 @@
-#' Osculating Discs or Circles of a Spatial Curve r(t)
+#' Osculating discs (or circles) of a spatial curve r(t)
 #'
-#' For each \code{t0} in \code{t_points}, it computes \eqn{T, N, B} and the curvature
-#' \eqn{\kappa(t0) = \|r'(t0)\times r''(t0)\| / \|r'(t0)\|^3}.
-#' The osculating circle has center \eqn{C = r(t0) + N/\kappa} and radius \eqn{R = 1/\kappa}.
-#' You can draw the \strong{osculating disk} (\code{fill="disk"}) or just the
-#' \strong{osculating circumference} (\code{fill="ring"}):
-#' \deqn{S(u,v) = C + R\,u\,(\,-N\cos v + T\sin v\,).}
+#' For each \code{t0} in \code{t_points}, it computes the Frenet frame
+#' \eqn{\mathbf{T}(t_0), \mathbf{N}(t_0), \mathbf{B}(t_0)} and the curvature
+#' \eqn{\kappa(t_0) = \| \mathbf{r}'(t_0) \times \mathbf{r}''(t_0) \| \,/\, \| \mathbf{r}'(t_0) \|^3 }.
+#' The osculating circle has center \eqn{\mathbf{C} = \mathbf{r}(t_0) + \mathbf{N}(t_0)/\kappa(t_0)}
+#' and radius \eqn{R = 1/\kappa(t_0)}.
+#'
+#' You can draw the \strong{osculating disc} (\code{fill = "disk"}) or just the
+#' \strong{osculating circumference} (\code{fill = "ring"}). A parametrization is:
+#' \deqn{\mathbf{S}(u,v) = \mathbf{C} + R\,u\,\big(-\mathbf{N}(t_0)\cos v + \mathbf{T}(t_0)\sin v\big).}
 #'
 #' @param X,Y,Z Functions of \code{t} returning \code{x(t)}, \code{y(t)}, \code{z(t)}.
 #' @param a,b Endpoints of the interval \code{[a,b]}.
-#' @param t_points Values of \code{t} where osculating circles/discs are constructed.
+#' @param t_points Numeric vector of \code{t} where osculating circles/discs are constructed.
 #' @param h Step size for centered finite differences.
 #' @param plot \code{TRUE}/\code{FALSE}. If \code{TRUE}, draw with \pkg{plotly}.
-#' @param n_samples Number of samples of the base curve (only if \code{show_curve=TRUE}).
+#' @param n_samples Number of samples of the base curve (only if \code{show_curve = TRUE}).
 #' @param fill \code{"disk"} (filled surface) or \code{"ring"} (only circumference).
-#' @param ru Radial subdivisions (only if \code{fill="disk"}).
+#' @param ru Radial subdivisions (only if \code{fill = "disk"}).
 #' @param rv Angular subdivisions (also used as ring points).
-#' @param colorscale Plotly colorscale for the discs (e.g. \code{"Reds"}).
-#' @param opacity Opacity of the discs (0–1, only if \code{fill="disk"}).
-#' @param ring_line Line style for the ring (only if \code{fill="ring"}).
+#' @param colorscale Plotly colorscale for the discs (e.g., \code{"Reds"}).
+#' @param opacity Opacity of the discs (0–1, only if \code{fill = "disk"}).
+#' @param ring_line Line style for the ring (only if \code{fill = "ring"}).
 #' @param show_curve,show_points Whether to show the base curve and the points \code{r(t)}.
 #' @param curve_line,point_marker Styles for curve and points (Plotly).
 #' @param show_radius \code{TRUE}/\code{FALSE} to draw a radius from \code{C} to the boundary.
-#' @param radius_phase Angle (in radians) of the radius, default \code{0}.
-#' @param radius_line Line style for the radius, e.g. \code{list(color="orange", width=5)}.
+#' @param radius_phase Angle (in radians) of the radius (default \code{0}).
+#' @param radius_line Line style for the radius, e.g., \code{list(color = "orange", width = 5)}.
 #' @param scene 3D scene settings (Plotly).
 #' @param bg Background colors (\code{paper}, \code{plot}).
-#' @param lighting Lighting options for \code{add_surface} (when \code{fill="disk"}).
+#' @param lighting Lighting options for \code{add_surface} (when \code{fill = "disk"}).
 #' @param tol Numerical tolerance.
 #'
-#' @return A \code{tibble} with columns:
-#' \code{t, x, y, z, kappa, cx, cy, cz, radius, Tx,Ty,Tz, Nx,Ny,Nz, Bx,By,Bz}.
+#' @return
+#' \describe{
+#'   \item{\code{data}}{A \code{tibble} with columns
+#'     \code{t, x, y, z, kappa, cx, cy, cz, radius, Tx, Ty, Tz, Nx, Ny, Nz, Bx, By, Bz}.}
+#'   \item{\code{plot}}{(if \code{plot = TRUE}) a \pkg{plotly} object.}
+#' }
+#'
+#' @examples
+#' X <- function(t) cos(t); Y <- function(t) sin(t); Z <- function(t) 0.2*t
+#' osculating_circle3d(X, Y, Z, a = 0, b = 6*pi, t_points = c(pi, 2*pi), plot = FALSE)
 #'
 #' @export
-osculating3d <- function(
+osculating_circle3d <- function(
     X, Y, Z,
     a, b,
     t_points,
@@ -60,16 +71,11 @@ osculating3d <- function(
       zaxis = list(title = "z(t)")
     ),
     bg = list(paper = "white", plot = "white"),
-#' @noRd
-#' @noRd
     lighting = list(ambient = 1, diffuse = 0.15, specular = 0, roughness = 1, fresnel = 0),
     tol = 1e-10
 ) {
   fill <- match.arg(fill)
 
-#' @noRd
-#' @noRd
-#' @noRd
   if (!is.numeric(t_points) || any(!is.finite(t_points)))
     stop("'t_points' must be finite numeric values.", call. = FALSE)
   if (any(t_points < a | t_points > b))

@@ -76,7 +76,7 @@ Draws the solid defined in spherical coordinates by
       \theta \in [\theta_{\min},\theta_{\max}],\quad
       \phi \in [\phi_{\min},\phi_{\max}]}
 using the standard convention:
-\eqn{\theta} = azimuth (in the xy–plane), \eqn{\phi} = polar angle from +z axis.
+\eqn{\theta} = azimuth (in the xy-plane), \eqn{\phi} = polar angle from +z axis.
 }
 \details{
 Optionally computes the volume via

@@ -1,14 +1,13 @@
 #' 3D Vector field in a curvilinear prism \eqn{(x,y,z)}
 #'
+#' @description
 #' Plots the vector field \eqn{\mathbf{F}(x,y,z)} over the volume
-#' \deqn{\{(x,y,z):\ x \in [a,b],\ y \in [(1-u)H_1(x)+uH_2(x)],\ z \in [(1-w)G_1(x,y)+wG_2(x,y)]\}}
-#' sampled on a regular grid \eqn{(i,j,k)} of \code{(NX+1)\times(NY+1)\times(NZ+1)} points
-#' using the linear blends \eqn{x=(1-i)a+i b}, \eqn{y=(1-j)H_1(x)+j H_2(x)},
-#' \eqn{z=(1-k)G_1(x,y)+k G_2(x,y)}.
-#'
-#' Arrows can be drawn as lines only, cones only (\pkg{plotly} \code{add_cone()}), both,
-#' or disabled. If your \pkg{plotly} build does not support \code{add_cone()}, a \emph{chevron}
-#' head (two “V” line segments) is used as a fallback.
+#' \deqn{\left\{ (x,y,z):\ a \le x \le b,\ H_1(x) \le y \le H_2(x),\ G_1(x,y) \le z \le G_2(x,y) \right\}}
+#' sampled on a regular grid indexed by \eqn{(i,j,k)} with
+#' \eqn{(N_X + 1) \times (N_Y + 1) \times (N_Z + 1)} points,
+#' using the linear blends
+#' \deqn{x = (1 - i)\,a + i\,b,\quad y = (1 - j)\,H_1(x) + j\,H_2(x),\quad z = (1 - k)\,G_1(x,y) + k\,G_2(x,y),}
+#' where \eqn{i \in \{0,\ldots,N_X\}}, \eqn{j \in \{0,\ldots,N_Y\}}, and \eqn{k \in \{0,\ldots,N_Z\}}.
 #'
 #' Arrow length is scaled with a saturated norm \eqn{\|\mathbf{F}\|}:
 #' \deqn{\tilde{\mathbf{F}} = \mathbf{F} / \sqrt{\|\mathbf{F}\|^2 + \texttt{normalize\_bias}}}
@@ -32,6 +31,7 @@
 #' @param arrow_opacity Opacity for cones (if \code{add_cone()} is available).
 #' @param arrow_size Relative head size w.r.t. \code{arrow_scale} (default \code{0.35}).
 #' @param scene,bg 3D scene options and background colors (\code{list(paper=, plot=)}).
+#'
 #'
 #' @return A list with
 #' \itemize{
@@ -194,7 +194,7 @@ vector_field3d <- function(
           cone_len <- max(1e-8, arrow_scale * span * arrow_size)
           cs_cone  <- as_colorscale(arrow_color, alpha = arrow_opacity)
           plt <- plt |>
-            plotly::add_cone(
+            plotly::add_trace(type = "cone",
               x = P1[,1], y = P1[,2], z = P1[,3],     # at the tip
               u = diru[,1], v = diru[,2], w = diru[,3],
               anchor   = "tip",

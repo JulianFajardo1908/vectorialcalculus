@@ -23,8 +23,8 @@
 #' @param tol_grad Threshold on \eqn{\|\nabla f(x)\|} to accept a critical point (default \code{1e-6}).
 #' @param tol_merge Euclidean distance to merge nearby candidates (default \code{1e-3}).
 #' @param tol_eig Eigenvalue tolerance for classification (positive/negative vs. near-zero).
-#' @param maxit Max iterations per \code{optim()} call.
-#' @param optim_method Primary method for \code{optim()} (\code{"BFGS"} or \code{"Nelder-Mead"}).
+#' @param maxit Max iterations per \code{stats::optim()} call.
+#' @param optim_method Primary method for \code{stats::optim()} (\code{"BFGS"} or \code{"Nelder-Mead"}).
 #'   If it errors, a fallback to \code{"Nelder-Mead"} is used.
 #' @param seed Optional integer seed for reproducibility of random starts.
 #' @param store_hessian Logical; if \code{TRUE}, returns the Hessian matrices for each critical point.
@@ -160,9 +160,9 @@ critical_points_nd <- function(
     x0 <- .clip(x0)
     ctrl <- list(maxit = maxit)
     fn   <- function(z) .gnorm2(z)
-    res  <- try(optim(x0, fn, method = optim_method, control = ctrl), silent = TRUE)
+    res  <- try(stats::optim(x0, fn, method = optim_method, control = ctrl), silent = TRUE)
     if (inherits(res, "try-error")) {
-      res <- optim(x0, fn, method = "Nelder-Mead", control = ctrl)
+      res <- stats::optim(x0, fn, method = "Nelder-Mead", control = ctrl)
     }
     res$par <- .clip(res$par)  # ensure inside bounds
     res
@@ -185,7 +185,7 @@ critical_points_nd <- function(
   }
 
   grid_starts <- make_grid()
-  rand_starts <- matrix(runif(n_random * n), nrow = n_random, ncol = n)
+  rand_starts <- matrix(stats::runif(n_random * n), nrow = n_random, ncol = n)
   # scale random to bounds
   for (i in seq_len(n)) rand_starts[, i] <- B[i,1] + rand_starts[, i] * (B[i,2] - B[i,1])
 

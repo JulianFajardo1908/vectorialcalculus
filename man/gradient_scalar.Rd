@@ -2,24 +2,26 @@
 % Please edit documentation in R/gradient_scalar.R
 \name{gradient_scalar}
 \alias{gradient_scalar}
-\title{Gradient of a scalar field (with optional plot)}
+\title{Gradient of a 2D scalar field}
 \usage{
 gradient_scalar(f, x0, h = NULL, plot = FALSE)
 }
 \arguments{
-\item{f}{Scalar field: function(x) with x numeric vector of length n.}
+\item{f}{Function of two variables \code{f(x, y)}.}
 
-\item{x0}{Point where the gradient is evaluated (numeric vector).}
+\item{x0}{Numeric vector of length 2, the evaluation point.}
 
-\item{h}{Step size for finite differences. Default NULL → automatic.}
+\item{h}{Numeric step size for finite differences.}
 
-\item{plot}{Logical. If TRUE and n=2 or 3, plot the gradient with plotly.}
+\item{plot}{Logical; if \code{TRUE}, draws the gradient with \pkg{plotly}.}
 }
 \value{
-Numeric vector with gradient components.
+Numeric vector of length 2 with the gradient components.
 }
 \description{
-Computes the gradient of a scalar field f:R^n→R using central differences.
-If plot=TRUE, it will also plot the gradient vector at the evaluation point
-(supports 2D and 3D only).
+Computes the gradient vector ∇f(x,y) at a point (x0, y0).
+}
+\examples{
+f <- function(v) exp(-(v[1]^2 + v[2]^2)) + 0.3*sin(2*v[1]*v[2])
+gradient_scalar(f, c(0.6, -0.4))
 }

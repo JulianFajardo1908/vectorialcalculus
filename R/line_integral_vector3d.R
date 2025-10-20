@@ -1,6 +1,9 @@
 #' 3D line integral of a vector field with an auto-fitted field domain
 #'
-#' Computes  ∫_a^b F(r(t))·r'(t) dt  and draws the curve together with arrows of F.
+#' @description
+#' Computes the line integral
+#' \deqn{\int_{a}^{b} \mathbf{F}(\mathbf{r}(t)) \cdot \mathbf{r}'(t)\, dt}
+#' and optionally plots the curve with arrows of \eqn{\mathbf{F}}.
 #' The arrow grid is fitted to the curve's bounding box unless you pass explicit ranges.
 #'
 #' @param F function(x,y,z) -> c(Fx,Fy,Fz)  (or function(x,y,z,t))
@@ -122,7 +125,7 @@ line_integral3d_work <- function(
       # field heads (cones if available)
       if (arrows %in% c("both","cone")) {
         if ("add_cone" %in% getNamespaceExports("plotly")) {
-          plt <- plotly::add_cone(
+          plt <- plotly::add_trace(type = "cone",
             plt,
             x = tips[,"x"], y = tips[,"y"], z = tips[,"z"],
             u = diru[,1], v = diru[,2], w = diru[,3],
@@ -136,7 +139,7 @@ line_integral3d_work <- function(
       }
 
       # curve colored by instantaneous power F·r'
-      pwr_col <- colorRampPalette(c("#2c7bb6","#abd9e9","#ffffbf","#fdae61","#d7191c"))(length(dot))
+      pwr_col <- grDevices::colorRampPalette(c("#2c7bb6","#abd9e9","#ffffbf","#fdae61","#d7191c"))(length(dot))
       plt <- plotly::add_trace(
         plt, x = cx, y = cy, z = cz,
         type = "scatter3d", mode = "lines+markers",
@@ -152,7 +155,7 @@ line_integral3d_work <- function(
                                  marker=list(size=4, color="firebrick"),
                                  showlegend = FALSE, hoverinfo="none")
 
-      ttl <- sprintf("3D line integral (work) ≈ %.6g", work)
+      ttl <- sprintf("3D line integral (work) \u2248 %.6g", work)
       plt <- plotly::layout(plt, title = ttl, scene = scene,
                             paper_bgcolor = bg$paper, plot_bgcolor = bg$plot)
       fig <- plt

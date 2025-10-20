@@ -1,6 +1,6 @@
-#' Frenet–Serret frame (T, N, B) for a 3D curve (numeric)
+#' Frenet-Serret frame (T, N, B) for a 3D curve (numeric)
 #'
-#' Computes the Frenet–Serret trihedron \eqn{(T, N, B)} at parameter values
+#' Computes the Frenet-Serret trihedron \eqn{(T, N, B)} at parameter values
 #' \code{t_points} and optionally plots the curve \eqn{r(t)} on \code{[a,b]}
 #' together with short segments representing \eqn{T(t)}, \eqn{N(t)}, and \eqn{B(t)}
 #' anchored at \eqn{r(t)} using \pkg{plotly}.
@@ -171,7 +171,7 @@ frenet_frame3d <- function(
 
       plt <- plt |>
         plotly::layout(
-          title = "Frenet–Serret frame (T, N, B)",
+          title = "Frenet\u2013Serret frame (T, N, B)",
           scene = scene, paper_bgcolor = bg$paper, plot_bgcolor = bg$plot
         )
       print(plt)

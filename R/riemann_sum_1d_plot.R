@@ -26,6 +26,10 @@
 #' @param show_baseline Logical; draw a horizontal baseline at \code{baseline}.
 #' @param baseline Baseline y-value (default 0); \code{baseline_color}, \code{baseline_width} style it.
 #' @param warn_heavy Warn if \code{n} is large (many polygons).
+#' @param edge_width Numeric width for bar edges.
+#' @param baseline_color Color for the baseline (y=0).
+#' @param baseline_width Numeric width for the baseline.
+
 #'
 #' @return A list with:
 #' \itemize{

@@ -118,7 +118,7 @@ line_integral_vector <- function(
             showlegend = FALSE, name = "integrand"
           ) |>
           plotly::layout(
-            title = sprintf("Line integral (value ≈ %.6g)", value),
+            title = sprintf("Line integral (value \u2248 %.6g)", value),
             scene = scene, paper_bgcolor = bg$paper, plot_bgcolor = bg$plot
           )
       } else {
@@ -131,7 +131,7 @@ line_integral_vector <- function(
             showlegend = FALSE
           ) |>
           plotly::layout(
-            title = sprintf("Line integral (value ≈ %.6g)", value),
+            title = sprintf("Line integral (value \u2248 %.6g)", value),
             scene = scene, paper_bgcolor = bg$paper, plot_bgcolor = bg$plot
           )
       }
@@ -295,7 +295,7 @@ line_integral_vector2d <- function(
           )
         ) |>
         plotly::layout(
-          title = sprintf("Vector line integral: Work ≈ %.6g", value),
+          title = sprintf("Vector line integral: Work \u2248 %.6g", value),
           scene = scene,
           paper_bgcolor = bg$paper,
           plot_bgcolor  = bg$plot

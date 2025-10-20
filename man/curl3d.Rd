@@ -30,7 +30,7 @@ Named numeric vector of length 3 with the curl components:
 \description{
 Computes the curl \eqn{\nabla \times \mathbf F} of a vector field
 \eqn{\mathbf F(x,y,z)} (or \eqn{\mathbf F(x,y,z,t)}) at a given point using
-second–order \strong{central finite differences}.
+second-order \strong{central finite differences}.
 }
 \details{
 For \eqn{\mathbf F=(F_x,F_y,F_z)}, the curl is

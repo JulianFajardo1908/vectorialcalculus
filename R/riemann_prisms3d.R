@@ -1,35 +1,46 @@
-#' 2D Riemann sums with rectangular 3D prisms (single function)
+#' Riemann rectangular prisms over a planar region
 #'
-#' Approximates  ∬_Ω F(x,y) dx dy  with  Ω = {(x,y): a ≤ x ≤ b,
-#' min(f1(x),f2(x)) ≤ y ≤ max(f1(x),f2(x)) } using an N×M partition.
-#' For each valid cell it computes cellwise \code{lower}, \code{upper},
-#' and \code{mean} of F on a fine subgrid, and (optionally) draws
-#' **rectangular prisms** with flat top (z constant on the cell) and
-#' vertical walls.
+#' @description
+#' Approximates \eqn{\iint_{\Omega} F(x,y)\,dx\,dy} over
+#' \eqn{\Omega = \{(x,y): a \le x \le b,\ \min(f_1(x), f_2(x)) \le y \le \max(f_1(x), f_2(x))\}}
+#' using an \eqn{N \times M} partition. For each valid cell it can draw
+#' \strong{rectangular prisms} with flat top (constant \eqn{z} per cell).
 #'
-#' @param F Integrand \code{function(x,y)}.
-#' @param f1,f2 y-bounds: \code{function(x)}.
-#' @param a,b x-interval (with \code{b>a}).
-#' @param N,M Integers \code{>=1} (divisions in \code{x} and \code{y}).
-#' @param plot If \code{TRUE}, draw with \pkg{plotly}.
-#' @param estimate Which estimate to return: \code{"lower"}, \code{"upper"},
-#'   \code{"mean"} or \code{"all"} (returns the three).
-#' @param sample_n Fine sampling per cell side (default \code{6}) to
-#'   evaluate \code{lower}, \code{upper}, \code{mean}.
-#' @param show_surface If \code{TRUE}, overlay the true surface \code{z = F(x,y)}.
-#' @param surface_colorscale, surface_opacity, show_surface_grid, surface_grid_color, surface_grid_width
-#'   Aesthetics for the true surface.
-#' @param color_by Which statistic colors the prism tops: \code{"lower"}, \code{"upper"}, \code{"mean"}.
-#' @param top_colorscale Colorscale for prism tops (Plotly name, single color, or vector).
-#' @param top_opacity Top (ceiling) opacity (0–1).
-#' @param side_color, side_opacity Color/opacity for the 4 vertical sides.
-#' @param frame_color, frame_width Wireframe for prism edges (set \code{NA} to hide).
-#' @param scene,bg Plotly scene and backgrounds.
+#' @param F function \code{F(x,y)} returning a numeric scalar.
+#' @param a,b Numeric x-interval endpoints \eqn{[a,b]} with \eqn{a \le b}.
+#' @param f1,f2 functions \code{f_i(x)}; lower/upper y-boundaries.
+#' @param N,M integers > 0; number of cells in x and y.
+#' @param plot logical; if \code{TRUE}, draw the prisms.
+#' @param estimate character; which estimate to compute (\code{"lower"}, \code{"upper"}, \code{"mean"}).
+#' @param sample_n integer; subgrid size per cell for mean/estimates.
+#' @param show_surface logical; draw the underlying surface \eqn{z = F(x,y)}.
+#' @param surface_colorscale character; Plotly colorscale for the surface (e.g., \code{"Viridis"}).
+#' @param surface_opacity Numeric in \eqn{[0,1]}.
+#' @param show_surface_grid logical; show contour grid on the surface.
+#' @param surface_grid_color character; color for surface grid lines.
+#' @param surface_grid_width numeric; width for surface grid lines.
+#' @param color_by character; how to color prisms (\code{"value"}, \code{"height"}, etc.).
+#' @param top_colorscale character; colorscale for prism tops.
+#' @param top_opacity     Numeric in \eqn{[0,1]}.
+#' @param side_color character; color for prism sides.
+#' @param side_opacity    Numeric in \eqn{[0,1]}.
+#' @param frame_color character; color for cell frames.
+#' @param frame_width numeric; line width for frames.
+#' @param scene list; Plotly 3D scene options.
+#' @param bg list; background colors (\code{paper}, \code{plot}).
 #'
-#' @return List with:
-#'   \item \code{cells}: tibble with \code{x0,y0,hx,hy,z_lower,z_upper,z_mean}.
-#'   \item \code{sum_lower}, \code{sum_upper}, \code{sum_mean}.
-#'   \item \code{fig}: plotly object if \code{plot=TRUE}, else \code{NULL}.
+#' @return
+#' \describe{
+#'   \item{\code{lower}}{Lower Riemann sum on the selected partition (if requested).}
+#'   \item{\code{upper}}{Upper Riemann sum on the selected partition (if requested).}
+#'   \item{\code{mean}}{Cellwise mean of \eqn{F} on the fine subgrid (if requested).}
+#'   \item{\code{plot}}{Plotly object if \code{plot = TRUE}, else \code{NULL}.}
+#' }
+#'
+#' @examples
+#' F <- function(x,y) x*y
+#' f1 <- function(x) 0; f2 <- function(x) 1 - x
+#' # riemann_prisms3d(F, a = 0, b = 1, f1, f2, N = 10, M = 10, plot = FALSE)
 #'
 #' @export
 riemann_prisms3d <- function(
@@ -61,7 +72,7 @@ riemann_prisms3d <- function(
   estimate <- match.arg(estimate)
   color_by <- match.arg(color_by)
 
-  # --- tiny helpers (colorscale handling like in your other fns)
+  # --- tiny helpers (colorscale handling)
   is_color <- function(x) {
     if (!is.character(x) || length(x)!=1) return(FALSE)
     if (grepl("^rgba?\\(", x, TRUE)) return(TRUE)
@@ -90,23 +101,32 @@ riemann_prisms3d <- function(
   }
 
   # --- validation
-  if (!is.function(F) || !is.function(f1) || !is.function(f2)) stop("F, f1, f2 must be functions.", call. = FALSE)
-  if (!is.numeric(a) || !is.numeric(b) || b<=a) stop("'a'<'b' required.", call. = FALSE)
-  for (nm in c("N","M","sample_n")) if (!is.numeric(get(nm)) || get(nm)<1) stop(nm," must be >=1.", call. = FALSE)
+  if (!is.function(F) || !is.function(f1) || !is.function(f2)) {
+    stop("F, f1, f2 must be functions.", call. = FALSE)
+  }
+  if (!is.numeric(a) || !is.numeric(b) || b <= a) {
+    stop("'a'<'b' required.", call. = FALSE)
+  }
+  for (nm in c("N","M","sample_n")) {
+    val <- get(nm)
+    if (!is.numeric(val) || length(val) != 1L || !is.finite(val) || val < 1) {
+      stop(nm, " must be a finite numeric scalar >= 1.", call. = FALSE)
+    }
+  }
 
   # --- base partition in x, uniform
   hx <- (b - a) / N
   xs_nodes <- seq(a, b, length.out = N + 1)
 
   # global y-span used for the rectangular grid track;
-  # we still clip each cell against the y-intervals at x0 and x1 to stay inside Ω.
+  # we still clip each cell against the y-intervals at x0 and x1 to stay inside Omega.
   ylo_nodes <- pmin(vapply(xs_nodes, f1, numeric(1)), vapply(xs_nodes, f2, numeric(1)))
   yhi_nodes <- pmax(vapply(xs_nodes, f1, numeric(1)), vapply(xs_nodes, f2, numeric(1)))
   cmin <- min(ylo_nodes); dmax <- max(yhi_nodes)
   hy <- (dmax - cmin) / M
   y_nodes <- seq(cmin, dmax, length.out = M + 1)
 
-  # iterate rectangular base cells [x0,x1]×[y0,y1], then clip to intersection
+  # iterate rectangular base cells [x0,x1] x [y0,y1], then clip to intersection
   cells <- list()
   eval_cell_stats <- function(x0, x1, y0, y1) {
     xs <- seq(x0, x1, length.out = sample_n + 1)
@@ -195,7 +215,7 @@ riemann_prisms3d <- function(
 
       fig <- plotly::plot_ly()
 
-      # optional true surface over rectangular bbox [a,b]×[cmin,dmax]
+      # optional true surface over rectangular bbox [a,b] x [cmin,dmax]
       if (isTRUE(show_surface)) {
         nx <- max(40, N*6); ny <- max(40, M*6)
         xs <- seq(a, b, length.out = nx)
@@ -275,3 +295,4 @@ riemann_prisms3d <- function(
   }
   out
 }
+

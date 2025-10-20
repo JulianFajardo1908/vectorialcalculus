@@ -1,0 +1,142 @@
+---
+title: "Curvas parametrizadas en R: longitud de arco, marco de Frenet–Serret y cinta osculadora"
+author: "Julián Fajardo & Col."
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: show
+    df-print: kable
+    smooth-scroll: true
+  pdf:
+    documentclass: article
+    number-sections: true
+execute:
+  echo: true
+  warning: false
+  message: false
+
+---
+
+## 1. Propósito y alcance
+
+Este documento acompaña la sección de **curvas parametrizadas** del artículo propuesto para el **R Day**. La meta es exhibir, de forma breve y reproducible, cómo un paquete en R orientado a cálculo vectorial puede articular el análisis **analítico** (cálculos de longitud de arco, curvatura y torsión) con el **geométrico** (visualizaciones 3D e inspección del marco de Frenet–Serret y la cinta osculadora).
+
+- **Ejemplo A:** Longitud de arco de una hélice.
+- **Ejemplo B:** Marco de Frenet–Serret sobre una curva de Lissajous.
+- **Ejemplo C:** Cinta osculadora sobre un nudo trébol.
+
+> Nota didáctica. Estos tres ejemplos muestran una progresión natural: magnitud (longitud), dirección y cambio (Frenet–Serret), y extensión superficial guiada por la binormal (cinta osculadora).
+
+## 2. Paquetes y configuración
+
+::: {.callout-note}
+**Sugerencia**. Si su entorno es nuevo, se recomienda instalar previamente los paquetes `vectorialcalculus`, `plotly` y `ggplot2`.  
+:::
+
+```{r}
+install.packages(c("plotly","ggplot2"))
+# remotes::install_github("usuario/vectorialcalculus") # si aplica
+
+library(plotly)
+library(ggplot2)
+# Cargue aquí su paquete principal para curvas: 
+library(vectorialcalculus)
+```
+
+> Si el paquete aún está en desarrollo, este archivo puede servir como **vitrina** y **prueba de concepto** para la sesión del R Day.
+
+## 3. Ejemplo A — Longitud de arco (Hélice simple)
+
+Consideremos la curva
+\[
+\mathbf{r}(t) = (\cos t,\, \sin t,\, t), \quad t \in [0, 2\pi].
+\]
+
+La hélice presenta curvatura y torsión constantes. Desde el punto de vista pedagógico, es ideal para introducir el concepto de **longitud de arco**: una cantidad geométrica concreta que resume el “camino recorrido” por la curva.
+
+```{r}
+# Ejemplo con una función tipo arc_length3d(..) de su paquete.
+# Ajuste los nombres de los argumentos si su implementación difiere.
+# El bloque asume una función arc_length3d que:
+#   - Evalúa la longitud de arco en [a,b]
+#   - Devuelve (o imprime) el valor numérico
+#   - (opcional) Dibuja la curva 3D con parámetros de estilo
+#
+arc_length3d(
+   X = function(t) cos(t),
+   Y = function(t) sin(t),
+   Z = function(t) t,
+   a = 0, b = 2*pi,
+   plot = TRUE,
+   plot_line = list(color = "red", width = 3),
+   n_samples = 300
+ )
+
+
+```
+
+**Lectura geométrica.** La visualización 3D —idealmente interactiva— permite “ver” la hélice y asociar la longitud con una medida tangible del recorrido, lo que ancla el cálculo integral a la intuición espacial.
+
+## 4. Ejemplo B — Marco de Frenet–Serret (Curva de Lissajous)
+
+Curva
+$$
+\mathbf{r}(t) = (\sin(3t),\, \sin(4t),\, \sin(5t)), \quad t \in [0, 2\pi],
+$$
+rica en oscilaciones y simetrías. Su **marco de Frenet–Serret** —tangente \(\mathbf{T}\), normal $\mathbf{N}$ y binormal \(\mathbf{B}\)— cambia de forma notable a lo largo de la trayectoria.
+
+```{r}
+# Ejemplo con una función frenet_serret3d(..) de su paquete que
+# grafique la curva y muestre T, N, B en puntos muestreados.
+
+frenet_frame3d(
+  X = function(t) sin(3*t),
+  Y = function(t) sin(4*t),
+  Z = function(t) sin(5*t),
+  0, 2*pi,
+  t_points = seq(0, 2*pi, length.out = 200),  # puntos donde se grafican T, N, B
+  plot = TRUE,
+  n_samples = 500,
+  vec_scale = 0.2,
+  T_line = list(color="red",   width=5),
+  N_line = list(color="green", width=5),
+  B_line = list(color="black", width=5)
+)
+
+
+
+```
+
+**Nota docente.** La visualización de \(\mathbf{T},\mathbf{N},\mathbf{B}\) en puntos discretos (p. ej., 10–20 marcas) ayuda a entender “cómo gira” la curva localmente. La Lissajous muestra bien esa variabilidad.
+
+## 5. Ejemplo C — Cinta osculadora (Nudo trébol)
+
+Nudo trébol
+$$
+\mathbf{r}(t) = (\sin t + 2\sin(2t),\, \cos t - 2\cos(2t),\, -\sin(3t)), \quad t \in [0,2\pi].
+$$
+
+La **cinta osculadora** extiende la curva a una delgada superficie que sigue la binormal. Es un recurso visual potente para apreciar la torsión y el “giro tridimensional” de la trayectoria.
+
+```{r}
+# Ejemplo con una función osculating_ribbon3d(..) de su paquete, que
+# construya la cinta alrededor de la curva mediante (T, B) y un ancho dado.
+#
+osculating_ribbon3d(
+  X = function(t) sin(t) + 2*sin(2*t),
+  Y = function(t) cos(t) - 2*cos(2*t),
+  Z = function(t) t,
+  0, 2*pi,
+  plot = TRUE
+)
+
+
+```
+
+**Comentario geométrico.** La cinta osculadora ilustra cómo la curva “arrastra” un par de direcciones privilegiadas (tangente y binormal), revelando regiones con torsión elevada y zonas casi planas.
+
+## 6. Cierre breve
+
+Estos tres ejemplos condensan la propuesta pedagógica del artículo: **cálculo y geometría, juntos**. En R, la alternancia natural entre código, números y figuras hace que la intuición se construya al tiempo que se preserva el rigor analítico. Para el R Day, esta vitrina puede abrir el diálogo con otros colegas sobre docencia, visualización y desarrollo de paquetes orientados a matemáticas.

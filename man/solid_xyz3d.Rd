@@ -2,7 +2,7 @@
 % Please edit documentation in R/solid_xyz3d.R
 \name{solid_xyz3d}
 \alias{solid_xyz3d}
-\title{Solid \eqn{(x,y,z)} with \eqn{y \in [H_1(x), H_2(x)]} and \eqn{z \in [G_1(x,y), G_2(x,y)]}}
+\title{Solid (x,y,z)}
 \usage{
 solid_xyz3d(
   H1,
@@ -61,13 +61,13 @@ solid_xyz3d(
 \item{mode}{\code{"faces"}, \code{"wireframe"} or \code{"both"}.}
 
 \item{show_faces}{Logical vector of length 6 indicating which faces to show,
-in the order \code{c("x=a","x=b","y=H1","y=H2","z=G1","z=G2")}.}
+in the order \code{c("x=a","x=b","y=H1","y=H2","z=G1","z=G2")}. Length 1 is also accepted.}
 
 \item{colorscales}{Color scales for faces. Accepts:
 \itemize{
-\item A single Plotly scale name (e.g. \code{"Blues"}, \code{"Viridis"}) → applied to all faces.
-\item A single flat color (R name, \code{"#RRGGBB"}, \code{"rgba(...)"}) → flat scale.
-\item A color vector \code{c("white","#2a9d8f",...)} → evenly spaced gradient for all faces.
+\item A single Plotly scale name (e.g. \code{"Blues"}, \code{"Viridis"}) applied to all faces.
+\item A single flat color (R name, \code{"#RRGGBB"}, \code{"rgba(...)"}) -> flat scale.
+\item A color vector \code{c("white","#2a9d8f",...)} -> evenly spaced gradient for all faces.
 \item A vector/list of 6 scales (one per face) in any of the formats above.
 }}
 
@@ -81,7 +81,7 @@ in the order \code{c("x=a","x=b","y=H1","y=H2","z=G1","z=G2")}.}
 
 \item{edge_line}{Edge style (\code{list(color, width, dash)}).}
 
-\item{wire_step}{Integer \eqn{\ge 1}: draw every \code{wire_step}-th mesh line in wireframe mode.}
+\item{wire_step}{Integer >= 1: draw every \code{wire_step}-th mesh line in wireframe mode.}
 
 \item{wire_line}{Wireframe line style (\code{list(color, width, dash)}).}
 
@@ -89,7 +89,7 @@ in the order \code{c("x=a","x=b","y=H1","y=H2","z=G1","z=G2")}.}
 
 \item{bg}{Background colors: \code{list(paper="white", plot="white")}.}
 
-\item{compute_volume}{Logical. If \code{TRUE}, estimates \eqn{\int_a^b \int_{H_1}^{H_2} (G_2-G_1)\,dy\,dx}.}
+\item{compute_volume}{Logical. If \code{TRUE}, approximate volume.}
 
 \item{vol_method}{Volume integration method: \code{"adaptive"} (nested \code{stats::integrate})
 or \code{"grid"} (trapezoidal rule on a regular grid).}
@@ -101,11 +101,11 @@ can be a number or numeric vector.}
 
 \item{slice_mode}{Slice rendering mode: \code{"surface"}, \code{"wireframe"} or \code{"both"}.}
 
-\item{slice_nx, slice_nu, slice_nv}{Mesh resolution for slices (\eqn{x}: \code{nu×nv}, \eqn{y}: \code{nx×nv}, \eqn{z}: \code{nx×nu}).}
+\item{slice_nx, slice_nu, slice_nv}{Mesh resolution for slices.}
 
 \item{slice_colorscales}{Color scales for slices: \code{list(x=, y=, z=)} in the same formats as \code{colorscales}.}
 
-\item{slice_opacity}{Opacity for slices (0–1).}
+\item{slice_opacity}{Opacity for slices (0-1).}
 
 \item{slice_show_grid, slice_grid_color, slice_grid_width}{Grid options for slices.}
 
@@ -121,54 +121,25 @@ A list with:
 }
 \description{
 Builds and (optionally) renders with \pkg{plotly} the solid
-\deqn{\{(x,y,z):\ x\in[a,b],\ y\in[H_1(x),H_2(x)],\ z\in[G_1(x,y),G_2(x,y)]\}}
+\eqn{\{(x,y,z): x \in [a,b], y \in [H_1(x),H_2(x)], z \in [G_1(x,y),G_2(x,y)]\}}
 using a curvilinear-prism parametrization. It supports:
 \itemize{
-\item \strong{Display modes}: \code{mode = "faces" | "wireframe" | "both"}.
-\item \strong{Numerical volume}: \code{compute_volume = TRUE} with \code{vol_method = "adaptive"|"grid"}.
-\item \strong{Internal slices} on planes \eqn{x=x_0}, \eqn{y=y_0}, \eqn{z=z_0}.
-\item \strong{Flexible colors}: flat colors (R names, \code{"#RRGGBB"}, \code{"rgba(...)"});
+\item Display modes: \code{mode = "faces" | "wireframe" | "both"}.
+\item Numerical volume: \code{compute_volume = TRUE} with \code{vol_method = "adaptive"|"grid"}.
+\item Internal slices on planes \eqn{x=x_0}, \eqn{y=y_0}, \eqn{z=z_0}.
+\item Flexible colors: flat colors (R names, \code{"#RRGGBB"}, \code{"rgba(...)"});
 color vectors (gradients); or Plotly color scales (e.g. \code{"Viridis"}).
 You can pass 1 or 6 scales for the six faces.
 }
 }
-\details{
-\strong{About color scales}: Each \emph{colorscale} can be
-\enumerate{
-\item A Plotly scale name (\code{"Blues"}, \code{"Viridis"}, …),
-\item A single color (R name, \code{"#RRGGBB"}, \code{"rgba(r,g,b,a)"}),
-\item A color vector (\code{c("white","#2a9d8f",...)}) → evenly spaced gradient,
-\item A ready Plotly list (pairs \code{list(list(pos,color), ...)}).
-}
-If \code{colorscales} has length 1 (or is a color vector), it is applied to all faces.
-}
 \examples{
-\dontshow{if (interactive()) \{}
+# Note: examples avoid plotting for CRAN checks
 H1 <- function(x) -1 - x
 H2 <- function(x)  1 - x^2
 G1 <- function(x,y) y
 G2 <- function(x,y) y + 1
-
-# Six flat face colors
-solid_xyz3d(
-  H1,H2,G1,G2, a=-1, b=1, plot=TRUE, mode="faces",
-  colorscales = c("#b3cde0","#ccebc5","#decbe4","#fed9a6","#ffffcc","#fbb4ae"),
-  opacities   = 0.30
-)
-
-# Global custom gradient + sparse wireframe
-solid_xyz3d(
-  H1,H2,G1,G2, a=-1, b=1, plot=TRUE, mode="both",
-  colorscales = c("white","#2a9d8f"),
-  opacities   = 0.25,
-  wire_step   = 12,
-  wire_line   = list(color="rgba(20,20,20,0.25)", width=1, dash="dot"),
-  edge_line   = list(color="rgba(30,30,30,0.35)", width=1),
-  slice = list(x = 0, z = 0.6),
-  slice_mode = "surface",
-  slice_colorscales = list(x = "#ffb703", y = "#9b5de5", z = c("white", "#2a9d8f")),
-  slice_opacity = 0.6
-)
-\dontshow{\}}
+s <- solid_xyz3d(H1,H2,G1,G2, a=-1, b=1, plot=FALSE, compute_volume=TRUE, vol_method="grid",
+                 nx_vol=50, ny_vol=50)
+s$volume$estimate
 
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/critical_points_2d.R
 \name{critical_points_2d}
 \alias{critical_points_2d}
-\title{Critical points of a 2D scalar field (unconstrained) + 3D plot}
+\title{Critical points in 2D via gradient and Hessian}
 \usage{
 critical_points_2d(
   f,
@@ -28,74 +28,40 @@ critical_points_2d(
 )
 }
 \arguments{
-\item{f}{\code{function(x,y)} returning a numeric scalar \eqn{f(x,y)}.}
+\item{f}{Function \code{f(x,y)} returning numeric scalar.}
 
-\item{xlim, ylim}{Domain intervals as \code{c(min, max)}.}
+\item{xlim, ylim}{Numeric length-2 vectors, domain limits.}
 
-\item{start_n}{Grid size for multi-start (for \eqn{g}): \code{c(nx, ny)}.}
+\item{start_n}{Integer; number of regular starting points per axis.}
 
-\item{n_rand}{Number of additional random starts within the domain.}
+\item{n_rand}{Integer; extra random starts.}
 
-\item{h}{Step(s) for finite differences. \code{NULL} (auto), a scalar, or \code{c(hx, hy)}.}
+\item{h}{Numeric step for finite differences.}
 
-\item{tol_grad}{Threshold on \eqn{\|\nabla f\|} to accept a critical point.}
+\item{tol_grad, tol_merge, tol_eig}{Numeric tolerances.}
 
-\item{tol_merge}{Euclidean distance used to merge nearby candidates.}
+\item{maxit}{Integer; max iterations per start.}
 
-\item{tol_eig}{Eigenvalue tolerance to decide the sign in classification.}
+\item{optim_method}{Character; e.g. \code{"BFGS"} or \code{"CG"}.}
 
-\item{maxit}{Max iterations per \code{optim()} call.}
+\item{plot}{Logical; draw surface and points.}
 
-\item{optim_method}{Primary method for \code{optim()} (default \code{"BFGS"}).
-If it fails, a \emph{fallback} to \code{"Nelder-Mead"} is used.}
+\item{grid_plot}{Integer; grid resolution for plotting.}
 
-\item{plot}{If \code{TRUE}, renders the surface and the critical points.}
+\item{surface_colorscale}{Character; Plotly colorscale.}
 
-\item{grid_plot}{Surface mesh density \code{c(nx, ny)} for plotting.}
+\item{surface_opacity}{Numeric in \eqn{[0,1]}.}
 
-\item{surface_colorscale}{Plotly colorscale name (e.g. \code{"YlGnBu"}, \code{"Viridis"}).}
+\item{cp_colors}{Named vector for point colors.}
 
-\item{surface_opacity}{Surface opacity in \eqn{[0,1]}.}
+\item{cp_size}{Numeric; point size.}
 
-\item{cp_colors}{Named list of colors for classes:
-\code{list(minimum=, maximum=, saddle=, flat=)}.}
-
-\item{cp_size}{Marker size for critical points.}
-
-\item{scene}{Plotly scene list (axes titles, aspect, etc.).}
+\item{scene}{List; Plotly 3D scene options.}
 }
 \value{
-A list with:
-\itemize{
-\item \code{critical_points}: \code{data.frame} with columns \code{x,y,z,grad_norm,class},
-\item \code{fig}: a \pkg{plotly} object if \code{plot=TRUE}, otherwise \code{NULL}.
-}
+Tibble/data.frame with columns (x, y, f, type, ...).
 }
 \description{
-Finds \strong{critical points} of a scalar field \eqn{f(x,y)} by solving
-\eqn{\nabla f(x,y)=0} numerically (multi-start minimization of
-\eqn{g(x,y)=\|\nabla f(x,y)\|^2}), \strong{classifies} them via the Hessian
-(as \emph{minimum}, \emph{maximum}, \emph{saddle}, or \emph{flat/indeterminate}),
-and draws a \strong{3D plot} of the surface with critical points highlighted.
-}
-\details{
-Central finite differences (order 2) are used for gradients and the Hessian.
-Nearby candidates are \emph{merged} using \code{tol_merge}.
-}
-\examples{
-\dontshow{if (interactive()) \{}
-# 1) Single minimum at (0,0): f = x^2 + y^2
-f1 <- function(x,y) x^2 + y^2
-out1 <- critical_points_2d(f1, xlim=c(-2,2), ylim=c(-2,2))
-out1$critical_points
-
-# 2) Monkey saddle at (0,0): f = x^3 - 3*x*y^2
-f2 <- function(x,y) x^3 - 3*x*y^2
-out2 <- critical_points_2d(f2, xlim=c(-2,2), ylim=c(-2,2), grid_plot=c(80,80))
-
-# 3) Multiple minima and maxima
-f3 <- function(x,y) x^4 + y^4 - 2*(x^2 + y^2)
-out3 <- critical_points_2d(f3, xlim=c(-2,2), ylim=c(-2,2))
-\dontshow{\}}
-
+Finds stationary points of \eqn{f(x,y)} over a given domain using grid starts
+and local refinement, and classifies them by Hessian eigenvalues.
 }

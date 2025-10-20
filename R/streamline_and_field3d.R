@@ -2,11 +2,11 @@
 #'
 #' Plots the 3D vector field \eqn{\mathbf F(x,y,z)} over a curvilinear volume and
 #' overlays the \strong{streamline} \eqn{\mathbf r'(t)=\mathbf F(\mathbf r(t),t)}
-#' with \eqn{\mathbf r(0)=\mathbf p}, integrated by fixed–step \strong{RK4} in a
+#' with \eqn{\mathbf r(0)=\mathbf p}, integrated by fixed-step \strong{RK4} in a
 #' \emph{single} \pkg{plotly} figure.
 #'
 #' The volume is defined by linear blends:
-#' \deqn{
+#' \eqn{
 #' \begin{aligned}
 #' x &= (1-i)\,a + i\,b,\quad i\in[0,1],\\
 #' y &= (1-j)\,H_1(x) + j\,H_2(x),\quad j\in[0,1],\\
@@ -14,8 +14,6 @@
 #' \end{aligned}
 #' }
 #'
-#' If your \pkg{plotly} has \code{add_cone()}, arrowheads are drawn as \emph{cones};
-#' otherwise a \emph{chevron} (two segments forming a “V”) is used as a fallback.
 #'
 #' @param F \code{function(x,y,z)} or \code{function(x,y,z,t)} returning \code{c(Fx,Fy,Fz)}.
 #'   If it includes \code{t}, the time dependence is used in the integration.
@@ -23,7 +21,6 @@
 #' @param G1,G2 \code{function(x,y)}: lower/upper limits in \eqn{z}.
 #' @param a,b Domain limits in \eqn{x} (\code{b > a}).
 #' @param NX,NY,NZ Integers \eqn{\ge 1}: sampling density of the field in \eqn{i,j,k}
-#'   (evaluates \code{(NX+1)\times(NY+1)\times(NZ+1)} points).
 #' @param p Streamline initial point \code{c(x0,y0,z0)}.
 #' @param T,step Final time and RK4 step. If \code{T<0}, integrates backward.
 #'
@@ -232,7 +229,7 @@ streamline_and_field3d <- function(
     if (isTRUE(has_cone)) {
       cone_len <- max(1e-8, arrow_scale * span * arrow_size)
       cs_cone  <- list(list(0, arrow_color), list(1, arrow_color))
-      plt <- plotly::add_cone(
+      plt <- plotly::add_trace(type = "cone",
         plt,
         x = field_segments$x1, y = field_segments$y1, z = field_segments$z1,
         u = diru[,1], v = diru[,2], w = diru[,3],

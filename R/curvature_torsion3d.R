@@ -77,7 +77,7 @@ curvature_torsion3d <- function(
   d1 <- function(f, t, h) (f(t + h) - f(t - h)) / (2*h)
   d2 <- function(f, t, h) (f(t + h) - 2*f(t) + f(t - h)) / (h*h)
   # Third derivative, centered finite difference (step h):
-  # f'''(t) ≈ (f(t-2h) - 2f(t-h) + 2f(t+h) - f(t+2h)) / (2 h^3)
+  # f'''(t) \u2248 (f(t-2h) - 2f(t-h) + 2f(t+h) - f(t+2h)) / (2 h^3)
   d3 <- function(f, t, h) (f(t - 2*h) - 2*f(t - h) + 2*f(t + h) - f(t + 2*h)) / (2*h^3)
 
   r  <- function(t) c(X(t), Y(t), Z(t))
@@ -94,7 +94,7 @@ curvature_torsion3d <- function(
 
   r1_norm <- norm(r1)
   if (r1_norm < tol) {
-    stop("||r'(t0)|| ≈ 0. Curvature/torsion undefined at t0 (possible singular point).", call. = FALSE)
+    stop("||r'(t0)|| \u2248 0. Curvature/torsion undefined at t0 (possible singular point).", call. = FALSE)
   }
 
   c12   <- cross(r1, r2)
@@ -103,10 +103,10 @@ curvature_torsion3d <- function(
   kappa <- n_c12 / (r1_norm^3)
 
   # torsion: triple product / ||r' x r''||^2
-  # det([r1 r2 r3]) = r1 · (r2 × r3)
+  # det([r1 r2 r3]) = r1 \u00B7 (r2 \u00D7 r3)
   triple <- dot(r1, cross(r2, r3))
   tau <- if (n_c12 < tol) {
-    warning("||r'(t0) × r''(t0)|| ≈ 0. Torsion undefined at t0; returning NA.", call. = FALSE)
+    warning("||r'(t0) \u00D7 r''(t0)|| \u2248 0. Torsion undefined at t0; returning NA.", call. = FALSE)
     NA_real_
   } else {
     triple / (n_c12^2)
@@ -143,8 +143,8 @@ curvature_torsion3d <- function(
           hoverinfo = "none"
         ) |>
         plotly::layout(
-          title = paste0("κ ≈ ", signif(kappa, 6),
-                         "   ·   τ ≈ ", ifelse(is.na(tau), "NA", signif(tau, 6))),
+          title = paste0("\u03BA \u2248 ", signif(kappa, 6),
+                         "   \u00B7   \u03C4 \u2248 ", ifelse(is.na(tau), "NA", signif(tau, 6))),
           scene = scene,
           paper_bgcolor = bg$paper,
           plot_bgcolor  = bg$plot

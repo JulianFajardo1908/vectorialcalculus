@@ -70,11 +70,7 @@ A list with
 }
 }
 \description{
-Plots the vector field \eqn{\mathbf{F}(x,y,z)} over the volume
-\deqn{\{(x,y,z):\ x \in [a,b],\ y \in [(1-u)H_1(x)+uH_2(x)],\ z \in [(1-w)G_1(x,y)+wG_2(x,y)]\}}
-sampled on a regular grid \eqn{(i,j,k)} of \code{(NX+1)\times(NY+1)\times(NZ+1)} points
-using the linear blends \eqn{x=(1-i)a+i b}, \eqn{y=(1-j)H_1(x)+j H_2(x)},
-\eqn{z=(1-k)G_1(x,y)+k G_2(x,y)}.
+Computes and visualizes the vector field \eqn{\nabla \times \mathbf{F}} (curl) in 3D space.
 }
 \details{
 Arrows can be drawn as lines only, cones only (\pkg{plotly} \code{add_cone()}), both,
