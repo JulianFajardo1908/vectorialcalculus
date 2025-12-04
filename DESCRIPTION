@@ -1,0 +1,35 @@
+Type: Package
+Package: vectorialcalculus
+Title: Vector Calculus Tools for Visualization and Analysis in R
+Version: 1.0.4
+Authors@R: c(
+    person("Julio", "Lizarazo Osorio", , "julio.lizarazo@uptc.edu.co", role = "aut",
+           comment = c(affiliation = "Universidad Pedagógica y Tecnológica de Colombia (UPTC)")),
+    person("Julian Mauricio", "Fajardo", , "julian.fajardo1908@gmail.com", role = c("aut", "cre"),
+           comment = c(affiliation = "Universidad El Bosque"))
+  )
+Description: Provides pedagogical functions for visualization and
+    numerical computation in vector calculus. Includes tools for
+    parametric curves, scalar and vector fields, gradients, divergences,
+    curls, line and surface integrals, and 2D/3D dynamic plots to support
+    teaching and analysis.
+License: MIT + file LICENSE
+URL: https://github.com/JulianFajardo1908/vectorialcalculus
+BugReports: https://github.com/JulianFajardo1908/vectorialcalculus/issues
+Depends: 
+    R (>= 4.1.0)
+Imports:
+    tibble,
+    stats
+Suggests:
+    plotly,
+    pracma,
+    ggplot2,
+    grDevices,
+    purrr,
+    utils
+Config/testthat/edition: 3
+Encoding: UTF-8
+Language: en
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
