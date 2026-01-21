@@ -117,7 +117,7 @@ the triple integral of the form
 coordinates.
 }
 \examples{
-\dontrun{
+\donttest{
 # Example: a quarter-twisted cup
 # R in [0, 1 + 0.2*cos(theta)],  z in [0, 1 + 0.5*r]
 R1 <- function(theta) 0
@@ -126,7 +126,7 @@ Z1 <- function(r, theta) 0
 Z2 <- function(r, theta) 1 + 0.5*r
 solid_cylindrical3d(
   R1, R2, Z1, Z2, th_min = 0, th_max = pi/2,
-  plot = TRUE, mode = "both",
+  plot = FALSE, mode = "both",
   colorscale = c("white", "#2a9d8f"), opacity = 0.35,
   show_surface_grid = TRUE,
   compute_volume = TRUE, vol_method = "adaptive"

@@ -79,7 +79,7 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Example 1: unique minimum at (1, 1, 1)
 #' f1 <- function(x) sum((x - 1)^2)
 #' B  <- rbind(c(-2, 3), c(-2, 3), c(-2, 3))  # 3D bounds

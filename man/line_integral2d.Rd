@@ -134,9 +134,8 @@ extruding the height values.
 }
 }
 \examples{
-# Scalar field and a simple planar curve
 f <- function(x, y) x^2 + y^2
 r <- function(t) c(t*cos(t), t*sin(3*t))
-# line_integral2d(f, r, a = 0, b = 2*pi, plot = TRUE)
+line_integral2d(f, r, a = 0, b = 2*pi, plot = FALSE)
 
 }

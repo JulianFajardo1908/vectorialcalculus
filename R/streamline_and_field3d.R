@@ -31,7 +31,7 @@
 #' The streamline is defined as the trajectory of a particle whose
 #' velocity at each point is given by the vector field evaluated along
 #' the path. The field may optionally depend on time; if the function
-#' \code{F} has a time argument, it is used during integration. The
+#' \code{field} has a time argument, it is used during integration. The
 #' integration runs from time zero up to a final time, with positive or
 #' negative direction depending on the sign of the final time.
 #'
@@ -43,7 +43,7 @@
 #'         and end points.
 #' }
 #'
-#' @param F A function representing the vector field. It can be given as
+#' @param field A function representing the vector field. It can be given as
 #' \code{function(x, y, z)} or \code{function(x, y, z, t)}, and must
 #' return a numeric vector of length three \code{c(Fx, Fy, Fz)}.
 #' @param H1,H2 Functions of one variable \code{x} giving the lower and
@@ -56,7 +56,7 @@
 #' sampling density of the field in the three parameter directions.
 #' @param p Numeric vector of length three giving the initial point of
 #' the streamline, in the form \code{c(x0, y0, z0)}.
-#' @param T Final integration time for the streamline. A negative value
+#' @param t_final Final integration time for the streamline. A negative value
 #' integrates backward in time.
 #' @param step Step size for the fixed-step RK4 integration. Must be
 #' strictly positive.
@@ -85,6 +85,8 @@
 #' aspect mode and axis titles.
 #' @param bg List with background colors for the figure, typically with
 #' entries \code{paper} and \code{plot}.
+#' @param ... Reserved for backward compatibility. Do not use.
+
 #'
 #' @return A list with:
 #' \itemize{
@@ -99,31 +101,31 @@
 #' }
 #'
 #' @examples
-#' \dontshow{if (interactive()) \{}
+#' \donttest{
 #' H1 <- function(x) -1
 #' H2 <- function(x)  1
 #' G1 <- function(x, y) -0.5
 #' G2 <- function(x, y)  0.5
-#' F  <- function(x, y, z) c(-y, x, 0.6)
+#' field <- function(x, y, z) c(-y, x, 0.6)
 #'
-#' streamline_and_field3d(
-#'   F, H1, H2, G1, G2,
+#' out <- streamline_and_field3d(
+#'   field, H1, H2, G1, G2,
 #'   a = -2, b = 2, NX = 10, NY = 8, NZ = 5,
-#'   p = c(1, 0, 0), T = 12, step = 0.02,
+#'   p = c(1, 0, 0), t_final = 2, step = 0.05,
 #'   arrows = "both", arrow_scale = 0.12, normalize_bias = 1,
 #'   normal_color = "rgba(0,0,0,0.55)", normal_width = 2,
 #'   arrow_color  = "#1d3557", arrow_opacity = 0.95, arrow_size = 0.4,
 #'   traj_color   = "#e63946", traj_width = 5, traj_markers = TRUE
 #' )
-#' \dontshow{\}}
+#' }
 #'
 #' @export
 streamline_and_field3d <- function(
-    F, H1, H2, G1, G2,
+    field, H1, H2, G1, G2,
     a, b, NX = 8, NY = 6, NZ = 6,
-    p, T, step,
+    p, t_final, step,
     # field style
-    arrows = c("both","line","cone","none"),
+    arrows = c("both", "line", "cone", "none"),
     arrow_scale = 0.08,
     normalize_bias = 1,
     normal_color = "rgba(0,0,0,0.55)",
@@ -143,8 +145,18 @@ streamline_and_field3d <- function(
       yaxis = list(title = "y"),
       zaxis = list(title = "z")
     ),
-    bg = list(paper = "white", plot = "white")
+    bg = list(paper = "white", plot = "white"),
+    ...
 ) {
+  # ---- Backward compatibility: accept legacy arg names F and T via ...
+  dots <- list(...)
+  if (is.null(field) && !is.null(dots$F)) {
+    field <- dots$F
+  }
+  if (missing(t_final) && !is.null(dots$T)) {
+    t_final <- dots$T
+  }
+
   arrows <- match.arg(arrows)
 
   if (!requireNamespace("plotly", quietly = TRUE)) {
@@ -152,41 +164,39 @@ streamline_and_field3d <- function(
   }
 
   # --- basic checks
-  if (!is.function(F))  stop("'F' must be function(x,y,z) or function(x,y,z,t).", call. = FALSE)
-  if (!is.function(H1) || !is.function(H2)) stop("'H1' and 'H2' must be functions of x.", call. = FALSE)
-  if (!is.function(G1) || !is.function(G2)) stop("'G1' and 'G2' must be functions of (x,y).", call. = FALSE)
-
+  if (!is.function(field)) {
+    stop("'field' must be function(x,y,z) or function(x,y,z,t).", call. = FALSE)
+  }
+  if (!is.function(H1) || !is.function(H2)) {
+    stop("'H1' and 'H2' must be functions of x.", call. = FALSE)
+  }
+  if (!is.function(G1) || !is.function(G2)) {
+    stop("'G1' and 'G2' must be functions of (x,y).", call. = FALSE)
+  }
   if (!is.numeric(a) || !is.numeric(b) ||
       length(a) != 1L || length(b) != 1L ||
       !is.finite(a) || !is.finite(b) || b <= a) {
-    stop("'a' and 'b' must be finite scalars with b > a.", call. = FALSE)
+    stop("'a' and 'b' must be scalars with b > a.", call. = FALSE)
   }
-
-  check_pos_int <- function(val, name) {
-    if (!is.numeric(val) || length(val) != 1L || !is.finite(val) ||
-        val < 1 || abs(val - round(val)) > .Machine$double.eps^0.5) {
-      stop(sprintf("'%s' must be a positive integer.", name), call. = FALSE)
+  for (nm in c("NX", "NY", "NZ")) {
+    v <- get(nm)
+    if (!is.numeric(v) || length(v) != 1L || !is.finite(v) || v < 1) {
+      stop(sprintf("'%s' must be integer >= 1.", nm), call. = FALSE)
     }
   }
-  check_pos_int(NX, "NX")
-  check_pos_int(NY, "NY")
-  check_pos_int(NZ, "NZ")
-
   if (!is.numeric(p) || length(p) != 3L || any(!is.finite(p))) {
-    stop("'p' must be a numeric vector c(x0,y0,z0).", call. = FALSE)
+    stop("'p' must be c(x0,y0,z0).", call. = FALSE)
   }
-  if (!is.numeric(T) || length(T) != 1L || !is.finite(T)) {
-    stop("'T' must be a numeric scalar.", call. = FALSE)
+  if (!is.numeric(t_final) || length(t_final) != 1L || !is.finite(t_final)) {
+    stop("'t_final' must be a numeric scalar.", call. = FALSE)
   }
   if (!is.numeric(step) || length(step) != 1L || !is.finite(step) || step <= 0) {
-    stop("'step' must be a positive numeric scalar.", call. = FALSE)
+    stop("'step' must be > 0.", call. = FALSE)
   }
 
   # --- helpers
   has_cone <- "add_cone" %in% getNamespaceExports("plotly")
-
   perp_unit <- function(n) {
-    if (all(!is.finite(n)) || sum(n * n) == 0) return(c(1, 0, 0))
     if (abs(n[1]) <= abs(n[2]) && abs(n[1]) <= abs(n[3])) {
       v <- c(0, -n[3], n[2])
     } else if (abs(n[2]) <= abs(n[1]) && abs(n[2]) <= abs(n[3])) {
@@ -197,38 +207,36 @@ streamline_and_field3d <- function(
     v / sqrt(sum(v * v))
   }
 
-  # --- grids and curvilinear mapping
-  Ii <- seq(0, 1, length.out = NX + 1L)
-  Jj <- seq(0, 1, length.out = NY + 1L)
-  Kk <- seq(0, 1, length.out = NZ + 1L)
+  # --- grids & curvilinear mapping
+  Ii <- seq(0, 1, length.out = NX + 1)
+  Jj <- seq(0, 1, length.out = NY + 1)
+  Kk <- seq(0, 1, length.out = NZ + 1)
 
   n_tot <- length(Ii) * length(Jj) * length(Kk)
-  P0 <- matrix(NA_real_, n_tot, 3L)  # base points
-  V  <- matrix(NA_real_, n_tot, 3L)  # vectors F
+  P0 <- matrix(NA_real_, n_tot, 3)  # bases
+  V  <- matrix(NA_real_, n_tot, 3)  # vectors
   idx <- 0L
 
   for (i in Ii) {
     x <- (1 - i) * a + i * b
-    y1 <- H1(x)
-    y2 <- H2(x)
+    y1 <- H1(x); y2 <- H2(x)
     for (j in Jj) {
       y <- (1 - j) * y1 + j * y2
-      g1 <- G1(x, y)
-      g2 <- G2(x, y)
+      g1 <- G1(x, y); g2 <- G2(x, y)
       for (k in Kk) {
         z <- (1 - k) * g1 + k * g2
         idx <- idx + 1L
         P0[idx, ] <- c(x, y, z)
-        vec <- F(x, y, z)
-        if (!is.numeric(vec) || length(vec) != 3L || any(!is.finite(vec))) {
-          stop("F(x,y,z) must return a finite numeric vector c(Fx,Fy,Fz).", call. = FALSE)
+        vec <- field(x, y, z)
+        if (!is.numeric(vec) || length(vec) != 3L) {
+          stop("field(x,y,z) must return numeric length-3 c(Fx,Fy,Fz).", call. = FALSE)
         }
         V[idx, ] <- vec
       }
     }
   }
 
-  # --- bounding box and saturated arrow lengths
+  # --- bounding box & saturated arrow lengths
   rx <- range(P0[, 1], finite = TRUE)
   ry <- range(P0[, 2], finite = TRUE)
   rz <- range(P0[, 3], finite = TRUE)
@@ -236,35 +244,29 @@ streamline_and_field3d <- function(
   if (!is.finite(span) || span <= 0) span <- 1
 
   vmag <- sqrt(rowSums(V * V))
-  Vsat <- V / sqrt(vmag * vmag + normalize_bias)
+  Vsat <- V / sqrt(vmag^2 + normalize_bias)
   lsat <- sqrt(rowSums(Vsat * Vsat))
-
   diru <- Vsat
   nzr  <- lsat > 0
-  if (any(nzr)) {
-    diru[nzr, ] <- Vsat[nzr, , drop = FALSE] / lsat[nzr]
-  }
-  if (any(!nzr)) diru[!nzr, ] <- 0
+  diru[nzr, ]  <- Vsat[nzr, , drop = FALSE] / lsat[nzr]
+  diru[!nzr, ] <- 0
 
-  L   <- arrow_scale * span * lsat
-  P1  <- P0 + diru * L
+  L  <- arrow_scale * span * lsat
+  P1 <- P0 + diru * L
 
-  field_points <- data.frame(
-    x = P0[, 1], y = P0[, 2], z = P0[, 3],
-    mag = vmag
-  )
+  field_points   <- data.frame(x = P0[, 1], y = P0[, 2], z = P0[, 3], mag = vmag)
   field_segments <- data.frame(
     x0 = P0[, 1], y0 = P0[, 2], z0 = P0[, 3],
     x1 = P1[, 1], y1 = P1[, 2], z1 = P1[, 3]
   )
 
   # --- streamline (internal RK4)
-  F_eval <- function(x, y, z, t) {
-    if (length(formals(F)) >= 4L) F(x, y, z, t) else F(x, y, z)
+  field_eval <- function(x, y, z, t) {
+    if (length(formals(field)) >= 4L) field(x, y, z, t) else field(x, y, z)
   }
 
-  if (abs(T) < .Machine$double.eps) {
-    v0 <- F_eval(p[1], p[2], p[3], 0)
+  if (abs(t_final) < .Machine$double.eps) {
+    v0 <- field_eval(p[1], p[2], p[3], 0)
     speed0 <- sqrt(sum(v0 * v0))
     traj <- data.frame(
       t = 0,
@@ -272,55 +274,45 @@ streamline_and_field3d <- function(
       speed = speed0
     )
   } else {
-    n_steps <- ceiling(abs(T) / step)
-    signT   <- if (T >= 0) 1 else -1
+    n_steps <- ceiling(abs(t_final) / step)
+    signT   <- if (t_final >= 0) 1 else -1
     dt_def  <- signT * step
-
-    t <- numeric(n_steps + 1L)
-    t[1] <- 0
-    Y <- matrix(NA_real_, n_steps + 1L, 3L)
-    Y[1, ] <- p
+    t <- numeric(n_steps + 1L); t[1] <- 0
+    Y <- matrix(NA_real_, n_steps + 1L, 3); Y[1, ] <- p
 
     for (ii in 1:n_steps) {
       dt <- dt_def
-      if ((signT > 0 && (t[ii] + dt) > T) ||
-          (signT < 0 && (t[ii] + dt) < T)) {
-        dt <- T - t[ii]
+      if ((signT > 0 && (t[ii] + dt) > t_final) ||
+          (signT < 0 && (t[ii] + dt) < t_final)) {
+        dt <- t_final - t[ii]
       }
-      x  <- Y[ii, 1]
-      y  <- Y[ii, 2]
-      z  <- Y[ii, 3]
-      ti <- t[ii]
-
-      k1 <- F_eval(x, y, z, ti)
-      k2 <- F_eval(x + 0.5 * dt * k1[1],
-                   y + 0.5 * dt * k1[2],
-                   z + 0.5 * dt * k1[3],
-                   ti + 0.5 * dt)
-      k3 <- F_eval(x + 0.5 * dt * k2[1],
-                   y + 0.5 * dt * k2[2],
-                   z + 0.5 * dt * k2[3],
-                   ti + 0.5 * dt)
-      k4 <- F_eval(x + dt * k3[1],
-                   y + dt * k3[2],
-                   z + dt * k3[3],
-                   ti + dt)
-
+      x <- Y[ii, 1]; y <- Y[ii, 2]; z <- Y[ii, 3]; ti <- t[ii]
+      k1 <- field_eval(x, y, z, ti)
+      k2 <- field_eval(x + 0.5 * dt * k1[1],
+                       y + 0.5 * dt * k1[2],
+                       z + 0.5 * dt * k1[3],
+                       ti + 0.5 * dt)
+      k3 <- field_eval(x + 0.5 * dt * k2[1],
+                       y + 0.5 * dt * k2[2],
+                       z + 0.5 * dt * k2[3],
+                       ti + 0.5 * dt)
+      k4 <- field_eval(x + dt * k3[1],
+                       y + dt * k3[2],
+                       z + dt * k3[3],
+                       ti + dt)
       incr <- (k1 + 2 * k2 + 2 * k3 + k4) / 6
-      Y[ii + 1L, ] <- c(x, y, z) + dt * incr
-      t[ii + 1L]   <- t[ii] + dt
+      Y[ii + 1, ] <- c(x, y, z) + dt * incr
+      t[ii + 1]   <- t[ii] + dt
     }
 
     speed <- vapply(seq_along(t), function(jj) {
-      fj <- F_eval(Y[jj, 1], Y[jj, 2], Y[jj, 3], t[jj])
+      fj <- field_eval(Y[jj, 1], Y[jj, 2], Y[jj, 3], t[jj])
       sqrt(sum(fj * fj))
     }, numeric(1))
 
     traj <- data.frame(
       t = t,
-      x = Y[, 1],
-      y = Y[, 2],
-      z = Y[, 3],
+      x = Y[, 1], y = Y[, 2], z = Y[, 3],
       speed = speed
     )
   }
@@ -328,12 +320,11 @@ streamline_and_field3d <- function(
   # --- figure
   plt <- plotly::plot_ly()
 
-  # field shafts (only for "line" or "both")
-  if (arrows %in% c("both", "line")) {
-    xs <- as.numeric(rbind(field_segments$x0, field_segments$x1, NA_real_))
-    ys <- as.numeric(rbind(field_segments$y0, field_segments$y1, NA_real_))
-    zs <- as.numeric(rbind(field_segments$z0, field_segments$z1, NA_real_))
-
+  # field shafts
+  if (arrows %in% c("both", "line", "cone")) {
+    xs <- as.numeric(rbind(field_segments$x0, field_segments$x1, NA))
+    ys <- as.numeric(rbind(field_segments$y0, field_segments$y1, NA))
+    zs <- as.numeric(rbind(field_segments$z0, field_segments$z1, NA))
     plt <- plotly::add_trace(
       plt,
       x = xs, y = ys, z = zs,
@@ -343,24 +334,21 @@ streamline_and_field3d <- function(
     )
   }
 
-  # field heads (for "cone" or "both")
+  # field heads
   if (arrows %in% c("both", "cone")) {
     if (isTRUE(has_cone)) {
       cone_len <- max(1e-8, arrow_scale * span * arrow_size)
       cs_cone  <- list(list(0, arrow_color), list(1, arrow_color))
-
       plt <- plotly::add_trace(
         plt,
         type = "cone",
         x = field_segments$x1,
         y = field_segments$y1,
         z = field_segments$z1,
-        u = diru[, 1],
-        v = diru[, 2],
-        w = diru[, 3],
-        anchor    = "tip",
-        sizemode  = "absolute",
-        sizeref   = cone_len,
+        u = diru[, 1], v = diru[, 2], w = diru[, 3],
+        anchor     = "tip",
+        sizemode   = "absolute",
+        sizeref    = cone_len,
         colorscale = cs_cone,
         showscale  = FALSE,
         opacity    = arrow_opacity
@@ -369,20 +357,20 @@ streamline_and_field3d <- function(
       head_len <- max(1e-8, arrow_scale * span * arrow_size)
       head_w   <- head_len * 0.5
       hx <- hy <- hz <- numeric(0)
-
       for (i in seq_len(nrow(field_segments))) {
-        tip  <- c(field_segments$x1[i], field_segments$y1[i], field_segments$z1[i])
-        nvec <- diru[i, ]
-        base <- tip - head_len * nvec
-        pperp <- perp_unit(nvec)
+        tip  <- c(field_segments$x1[i],
+                  field_segments$y1[i],
+                  field_segments$z1[i])
+        n    <- diru[i, ]
+        if (all(n == 0)) next
+        base <- tip - head_len * n
+        pperp <- perp_unit(n)
         left  <- base + head_w * pperp
         right <- base - head_w * pperp
-
-        hx <- c(hx, tip[1], left[1],  NA_real_, tip[1], right[1], NA_real_)
-        hy <- c(hy, tip[2], left[2],  NA_real_, tip[2], right[2], NA_real_)
-        hz <- c(hz, tip[3], left[3],  NA_real_, tip[3], right[3], NA_real_)
+        hx <- c(hx, tip[1], left[1], NA, tip[1], right[1], NA)
+        hy <- c(hy, tip[2], left[2], NA, tip[2], right[2], NA)
+        hz <- c(hz, tip[3], left[3], NA, tip[3], right[3], NA)
       }
-
       plt <- plotly::add_trace(
         plt,
         x = hx, y = hy, z = hz,
@@ -401,24 +389,23 @@ streamline_and_field3d <- function(
     mode = if (isTRUE(traj_markers)) "lines+markers" else "lines",
     line = list(color = traj_color, width = traj_width),
     marker = list(size = traj_marker_size, color = traj_color),
-    showlegend = FALSE,
-    name = "streamline"
+    showlegend = FALSE, name = "streamline"
   )
 
   # start/end markers
+  n_last <- nrow(traj)
   plt <- plotly::add_markers(
-    plt, x = traj$x[1], y = traj$y[1], z = traj$z[1],
+    plt,
+    x = traj$x[1], y = traj$y[1], z = traj$z[1],
     marker = list(size = traj_marker_size + 2, color = "forestgreen"),
     showlegend = FALSE, hoverinfo = "none"
   )
-  last_idx <- nrow(traj)
   plt <- plotly::add_markers(
     plt,
-    x = traj$x[last_idx], y = traj$y[last_idx], z = traj$z[last_idx],
+    x = traj$x[n_last], y = traj$y[n_last], z = traj$z[n_last],
     marker = list(size = traj_marker_size + 2, color = "firebrick"),
     showlegend = FALSE, hoverinfo = "none"
   )
-
 
   plt <- plotly::layout(
     plt,
@@ -433,7 +420,7 @@ streamline_and_field3d <- function(
   list(
     field_points   = field_points,
     field_segments = field_segments,
-    traj           = traj,
-    fig            = plt
+    traj = traj,
+    fig = plt
   )
 }

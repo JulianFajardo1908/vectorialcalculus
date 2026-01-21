@@ -91,9 +91,9 @@
 #' f3 <- function(x, y, z) x^2 + y^2 + z
 #' directional_derivative3d(f3, x0 = c(1, 0, 0), v = c(1, 1, 0))
 #'
-#' # Two-dimensional example with plotting:
+#' # Two-dimensional example without plotting (fast, no plotly required):
 #' f2 <- function(x, y) x^2 + y^2
-#' # directional_derivative3d(f2, x0 = c(0, 0), v = c(1, 2), plot = TRUE)
+#' directional_derivative3d(f2, x0 = c(0, 0), v = c(1, 2), plot = FALSE)
 #'
 #' @export
 directional_derivative3d <- function(
@@ -174,14 +174,19 @@ directional_derivative3d <- function(
 
         build_strip <- function() {
           if (abs(v_hat[1]) >= 1e-14) {
-            slope <- v_hat[2] / v_hat[1]
-            s_seq <- xs_line - a
+            slope  <- v_hat[2] / v_hat[1]
+
+            # line in the xy-plane centered at (a, b)
+            y_center <- b + slope * (xs_line - a)
+
             r_seq <- seq(0, 1, length.out = n_r)
-            S <- matrix(rep(s_seq, each = n_r), nrow = n_r)
+
+            # grid for the strip
             Xmat <- matrix(rep(xs_line, each = n_r), nrow = n_r)
+
+            # interpolate between top edge (b + y_window) and the center line
             Ymat <- r_seq %o% rep(b + y_window, length(xs_line)) +
-              (1 - r_seq) %o% (slope * as.numeric(S) + b)
-            Ymat <- matrix(Ymat, nrow = n_r)
+              (1 - r_seq) %o% y_center
           } else {
             y_line <- seq(b - y_window, b + y_window, length.out = n_s)
             r_seq  <- seq(0, 1, length.out = n_r)
@@ -290,3 +295,4 @@ directional_derivative3d <- function(
   class(out) <- c("directional_derivative", class(out))
   out
 }
+

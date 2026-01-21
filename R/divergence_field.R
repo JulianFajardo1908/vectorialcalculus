@@ -1,13 +1,13 @@
 #' Numerical divergence of a vector field
 #'
 #' Computes the divergence of a vector field at a given point using
-#' central finite differences. The vector field \code{F} must take a
+#' central finite differences. The vector field \code{field} must take a
 #' numeric vector \code{x} and return a numeric vector of the same length.
 #'
 #' Optionally, if the dimension is 2 or 3 and \code{plot = TRUE},
 #' a simple visualization is produced using \pkg{plotly}.
 #'
-#' @param F Function of the form \code{F(x)} returning a numeric vector
+#' @param field Function of the form \code{field(x)} returning a numeric vector
 #'   of the same length as \code{x}.
 #' @param x0 Numeric vector giving the evaluation point.
 #' @param h Step size for finite differences. Can be:
@@ -23,13 +23,13 @@
 #' @return A numeric scalar: the divergence evaluated at \code{x0}.
 #'
 #' @examples
-#' F <- function(x) c(x[1] + x[2], x[2] - x[1])
-#' divergence_field(F, c(0.5, -0.2))
+#' field <- function(x) c(x[1] + x[2], x[2] - x[1])
+#' divergence_field(field, c(0.5, -0.2))
 #'
 #' @export
-divergence_field <- function(F, x0, h = NULL, plot = FALSE) {
-  if (!is.function(F)) {
-    stop("'F' must be a function(x).", call. = FALSE)
+divergence_field <- function(field, x0, h = NULL, plot = FALSE) {
+  if (!is.function(field)) {
+    stop("'field' must be a function(x).", call. = FALSE)
   }
   if (!is.numeric(x0)) {
     stop("'x0' must be numeric.", call. = FALSE)
@@ -37,9 +37,9 @@ divergence_field <- function(F, x0, h = NULL, plot = FALSE) {
   x0 <- as.numeric(x0)
   n  <- length(x0)
 
-  Fx0 <- F(x0)
+  Fx0 <- field(x0)
   if (!is.numeric(Fx0) || length(Fx0) != n) {
-    stop("'F(x)' must return a numeric vector of length n.", call. = FALSE)
+    stop("'field(x)' must return a numeric vector of length n.", call. = FALSE)
   }
 
   if (is.null(h)) {
@@ -58,11 +58,11 @@ divergence_field <- function(F, x0, h = NULL, plot = FALSE) {
   for (i in seq_len(n)) {
     ei <- rep(0, n)
     ei[i] <- h[i]
-    Fp <- F(x0 + ei)
-    Fm <- F(x0 - ei)
+    Fp <- field(x0 + ei)
+    Fm <- field(x0 - ei)
     if (!is.numeric(Fp) || length(Fp) != n ||
         !is.numeric(Fm) || length(Fm) != n) {
-      stop("F(x) must return a numeric vector of length n for all x.", call. = FALSE)
+      stop("field(x) must return a numeric vector of length n for all x.", call. = FALSE)
     }
     div <- div + (Fp[i] - Fm[i]) / (2 * h[i])
   }
@@ -77,7 +77,7 @@ divergence_field <- function(F, x0, h = NULL, plot = FALSE) {
         xs <- seq(x0[1] - 1, x0[1] + 1, length.out = 5L)
         ys <- seq(x0[2] - 1, x0[2] + 1, length.out = 5L)
         grid <- expand.grid(x = xs, y = ys)
-        vecs <- t(apply(grid, 1L, F))
+        vecs <- t(apply(grid, 1L, field))
 
         fig <- plotly::plot_ly()
         fig <- fig |>

@@ -5,10 +5,10 @@
 #' visualization of the curve together with arrows of the field.
 #'
 #' The parameter t runs from a to b. The curve r(t) must return a numeric
-#' vector of length three. The field F(x, y, z) may optionally also depend
+#' vector of length three. The field field(x, y, z) may optionally also depend
 #' on t through a fourth argument.
 #'
-#' @param F Function that represents the vector field. It must be a function
+#' @param field Function that represents the vector field. It must be a function
 #'   of three or four numeric arguments. In the three argument form the
 #'   arguments are x, y and z. In the four argument form the arguments are
 #'   x, y, z and t. The function must return a numeric vector of length three.
@@ -47,11 +47,19 @@
 #' }
 #'
 #' @examples
-#' NULL
+#' \donttest{
+#' field <- function(x, y, z) c(-y, x, 0.2*z)
+#' r <- function(t) c(cos(t), sin(t), 0.25*t)
+#' out <- line_integral3d_work(
+#'   field = field, r = r, a = 0, b = 2*pi,
+#'   plot = FALSE, n_curve = 200, n_field = 5
+#' )
+#' out$value
+#' }
 #'
 #' @export
 line_integral3d_work <- function(
-    F, r, a, b,
+    field, r, a, b,
     plot = TRUE,
     n_curve = 600,
     n_field = 7,
@@ -70,14 +78,26 @@ line_integral3d_work <- function(
 ) {
   arrows <- match.arg(arrows)
 
-  if (!is.function(F)) stop("'F' must be function(x,y,z) or (x,y,z,t).")
-  if (!is.function(r)) stop("'r' must be function(t)->c(x,y,z).")
-  stopifnot(is.numeric(a), is.numeric(b), length(a) == 1L, length(b) == 1L, b > a)
-  stopifnot(is.numeric(n_curve), n_curve >= 10, is.numeric(n_field), n_field >= 2)
+  if (!is.function(field)) {
+    stop("'field' must be function(x,y,z) or function(x,y,z,t).", call. = FALSE)
+  }
+  if (!is.function(r)) {
+    stop("'r' must be function(t) -> c(x,y,z).", call. = FALSE)
+  }
+  if (!is.numeric(a) || !is.numeric(b) || length(a) != 1L || length(b) != 1L ||
+      !is.finite(a) || !is.finite(b) || b <= a) {
+    stop("'a' and 'b' must be finite scalars with b > a.", call. = FALSE)
+  }
+  if (!is.numeric(n_curve) || length(n_curve) != 1L || !is.finite(n_curve) || n_curve < 10) {
+    stop("'n_curve' must be an integer >= 10.", call. = FALSE)
+  }
+  if (!is.numeric(n_field) || length(n_field) != 1L || !is.finite(n_field) || n_field < 2) {
+    stop("'n_field' must be an integer >= 2.", call. = FALSE)
+  }
 
-  # helper to call F with or without time
-  F_eval <- function(x, y, z, t) {
-    if (length(formals(F)) >= 4L) F(x, y, z, t) else F(x, y, z)
+  # helper to call field with or without time
+  field_eval <- function(x, y, z, t) {
+    if (length(formals(field)) >= 4L) field(x, y, z, t) else field(x, y, z)
   }
 
   # curve sampling
@@ -95,8 +115,8 @@ line_integral3d_work <- function(
     (Rxyz[n_curve, ] - Rxyz[n_curve - 1L, ]) / dt
   )
 
-  # integrand F(r(t)) . r'(t)
-  Fr <- t(mapply(function(x, y, z, t) F_eval(x, y, z, t), cx, cy, cz, t_curve))
+  # integrand field(r(t)) . r'(t)
+  Fr <- t(mapply(function(x, y, z, t) field_eval(x, y, z, t), cx, cy, cz, t_curve))
   dot <- rowSums(Fr * Rp)
 
   # composite Simpson rule (ensure even number of subintervals)
@@ -120,19 +140,17 @@ line_integral3d_work <- function(
     rz <- range(cz)
     pad_range <- function(rg) {
       span <- diff(rg)
-      if (span <= 0) span <- 1
+      if (!is.finite(span) || span <= 0) span <- 1
       c(rg[1] - pad * span, rg[2] + pad * span)
     }
     xlim <- pad_range(rx)
     ylim <- pad_range(ry)
     zlim <- pad_range(rz)
   } else {
-    stopifnot(
-      is.list(field_ranges),
-      !is.null(field_ranges$x),
-      !is.null(field_ranges$y),
-      !is.null(field_ranges$z)
-    )
+    if (!is.list(field_ranges) || is.null(field_ranges$x) ||
+        is.null(field_ranges$y) || is.null(field_ranges$z)) {
+      stop("'field_ranges' must be a list with components x, y, z.", call. = FALSE)
+    }
     xlim <- field_ranges$x
     ylim <- field_ranges$y
     zlim <- field_ranges$z
@@ -145,7 +163,7 @@ line_integral3d_work <- function(
   G <- as.matrix(expand.grid(xs, ys, zs))
   colnames(G) <- c("x", "y", "z")
 
-  V <- t(mapply(function(x, y, z) F_eval(x, y, z, 0), G[, "x"], G[, "y"], G[, "z"]))
+  V <- t(mapply(function(x, y, z) field_eval(x, y, z, 0), G[, "x"], G[, "y"], G[, "z"]))
   vmag <- sqrt(rowSums(V * V))
   Vsat <- V / sqrt(vmag^2 + normalize_bias)
   lsat <- sqrt(rowSums(Vsat * Vsat))
@@ -161,7 +179,7 @@ line_integral3d_work <- function(
   fig <- NULL
   if (isTRUE(plot)) {
     if (!requireNamespace("plotly", quietly = TRUE)) {
-      warning("Install 'plotly' to plot.")
+      warning("Install 'plotly' to plot.", call. = FALSE)
     } else {
       plt <- plotly::plot_ly()
 
@@ -195,7 +213,7 @@ line_integral3d_work <- function(
         }
       }
 
-      # curve coloured by instantaneous work density F . r'
+      # curve coloured by instantaneous work density field . r'
       plt <- plotly::add_trace(
         plt, x = cx, y = cy, z = cz,
         type = "scatter3d", mode = "lines+markers",
@@ -220,11 +238,10 @@ line_integral3d_work <- function(
       )
 
       ttl <- sprintf("3D line integral (work) = %.6g", work)
-      plt <- plotly::layout(
+      fig <- plotly::layout(
         plt, title = ttl, scene = scene,
         paper_bgcolor = bg$paper, plot_bgcolor = bg$plot
       )
-      fig <- plt
       print(fig)
     }
   }

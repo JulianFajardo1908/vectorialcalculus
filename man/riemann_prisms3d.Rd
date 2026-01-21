@@ -5,7 +5,7 @@
 \title{Riemann rectangular prisms over a planar region}
 \usage{
 riemann_prisms3d(
-  F,
+  f,
   f1,
   f2,
   a,
@@ -34,7 +34,7 @@ riemann_prisms3d(
 )
 }
 \arguments{
-\item{F}{A function \code{F(x, y)} returning a numeric scalar.}
+\item{f}{A function \code{f(x, y)} returning a numeric scalar.}
 
 \item{f1, f2}{Functions returning the lower and upper y-boundaries for each x.
 The valid y-range at each x is the interval between the minimum and maximum
@@ -110,9 +110,9 @@ When \code{plot = TRUE}, a 3D visualization of the prisms is produced using
 drawn over the rectangular bounding box that contains the region.
 }
 \examples{
-F  <- function(x, y) x * y
+f  <- function(x, y) x * y
 f1 <- function(x) 0
 f2 <- function(x) 1 - x
-# riemann_prisms3d(F, f1, f2, 0, 1, N = 10, M = 10, plot = FALSE)
+riemann_prisms3d(f, f1, f2, 0, 1, N = 10, M = 10, plot = FALSE)
 
 }

@@ -27,7 +27,7 @@
 #' results for rapidly varying fields, at the cost of increased
 #' sensitivity to floating-point error.
 #'
-#' @param F A function representing the vector field. It can be defined
+#' @param field A function representing the vector field. It can be defined
 #'        as \code{function(x, y, z)} or as \code{function(x, y, z, t)}.
 #'        It must return a numeric vector \code{c(Fx, Fy, Fz)}.
 #' @param x,y,z Numeric scalars giving the coordinates of the evaluation
@@ -49,21 +49,21 @@
 #'
 #' @examples
 #' # Simple rotating field: curl is constant in the third component
-#' F1 <- function(x, y, z) c(-y, x, 0.6)
-#' curl3d(F1, x = 0.1, y = -0.3, z = 2)
+#' field1 <- function(x, y, z) c(-y, x, 0.6)
+#' curl3d(field1, x = 0.1, y = -0.3, z = 2)
 #'
 #' # Time-dependent example (time does not affect the curl):
-#' F2 <- function(x, y, z, t) c(-y, x + t, z)
-#' curl3d(F2, x = 1, y = 2, z = 3, tval = 5)
+#' field2 <- function(x, y, z, t) c(-y, x + t, z)
+#' curl3d(field2, x = 1, y = 2, z = 3, tval = 5)
 #'
 #' # Using a smaller step size for more precision:
-#' curl3d(F1, x = 1, y = 1, z = 1, h = 1e-5)
+#' curl3d(field1, x = 1, y = 1, z = 1, h = 1e-5)
 #'
 #' @export
-curl3d <- function(F, x, y, z, h = NULL, tval = 0, method = c("central")) {
+curl3d <- function(field, x, y, z, h = NULL, tval = 0, method = c("central")) {
   method <- match.arg(method)
-  if (!is.function(F)) {
-    stop("'F' must be function(x,y,z) or function(x,y,z,t).", call. = FALSE)
+  if (!is.function(field)) {
+    stop("'field' must be function(x,y,z) or function(x,y,z,t).", call. = FALSE)
   }
   if (!is.numeric(x) || !is.numeric(y) || !is.numeric(z) ||
       length(x) != 1L || length(y) != 1L || length(z) != 1L ||
@@ -89,38 +89,38 @@ curl3d <- function(F, x, y, z, h = NULL, tval = 0, method = c("central")) {
     stop("Step sizes 'h' must be positive and finite.", call. = FALSE)
   }
 
-  # wrapper: evaluate F with or without time
-  F_eval <- function(xx, yy, zz, tt) {
-    out <- if (length(formals(F)) >= 4L) F(xx, yy, zz, tt) else F(xx, yy, zz)
+  # wrapper: evaluate field with or without time
+  field_eval <- function(xx, yy, zz, tt) {
+    out <- if (length(formals(field)) >= 4L) field(xx, yy, zz, tt) else field(xx, yy, zz)
     if (!is.numeric(out) || length(out) != 3L || any(!is.finite(out))) {
-      stop("F(x,y,z[,t]) must return a finite numeric vector of length 3.", call. = FALSE)
+      stop("field(x,y,z[,t]) must return a finite numeric vector of length 3.", call. = FALSE)
     }
     out
   }
 
   # central differences (2nd order)
   # dFz/dy
-  Fp <- F_eval(x, y + hy, z, tval)[3]; Fm <- F_eval(x, y - hy, z, tval)[3]
+  Fp <- field_eval(x, y + hy, z, tval)[3]; Fm <- field_eval(x, y - hy, z, tval)[3]
   dFz_dy <- (Fp - Fm) / (2 * hy)
 
   # dFy/dz
-  Fp <- F_eval(x, y, z + hz, tval)[2]; Fm <- F_eval(x, y, z - hz, tval)[2]
+  Fp <- field_eval(x, y, z + hz, tval)[2]; Fm <- field_eval(x, y, z - hz, tval)[2]
   dFy_dz <- (Fp - Fm) / (2 * hz)
 
   # dFx/dz
-  Fp <- F_eval(x, y, z + hz, tval)[1]; Fm <- F_eval(x, y, z - hz, tval)[1]
+  Fp <- field_eval(x, y, z + hz, tval)[1]; Fm <- field_eval(x, y, z - hz, tval)[1]
   dFx_dz <- (Fp - Fm) / (2 * hz)
 
   # dFz/dx
-  Fp <- F_eval(x + hx, y, z, tval)[3]; Fm <- F_eval(x - hx, y, z, tval)[3]
+  Fp <- field_eval(x + hx, y, z, tval)[3]; Fm <- field_eval(x - hx, y, z, tval)[3]
   dFz_dx <- (Fp - Fm) / (2 * hx)
 
   # dFy/dx
-  Fp <- F_eval(x + hx, y, z, tval)[2]; Fm <- F_eval(x - hx, y, z, tval)[2]
+  Fp <- field_eval(x + hx, y, z, tval)[2]; Fm <- field_eval(x - hx, y, z, tval)[2]
   dFy_dx <- (Fp - Fm) / (2 * hx)
 
   # dFx/dy
-  Fp <- F_eval(x, y + hy, z, tval)[1]; Fm <- F_eval(x, y - hy, z, tval)[1]
+  Fp <- field_eval(x, y + hy, z, tval)[1]; Fm <- field_eval(x, y - hy, z, tval)[1]
   dFx_dy <- (Fp - Fm) / (2 * hy)
 
   # curl

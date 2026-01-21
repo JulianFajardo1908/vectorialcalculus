@@ -84,7 +84,7 @@ the graph of a function \code{f(x)} around the line \code{y = a} on a
 finite interval, and compute its volume and surface areas.
 }
 \examples{
-# f <- function(x) sqrt(x)
-# solid_of_revolution_y(f, xlim = c(0, 4), a = 0)
+f <- function(x) sqrt(x)
+solid_of_revolution_y(f, xlim = c(0, 4), a = 0, plot = FALSE)
 
 }

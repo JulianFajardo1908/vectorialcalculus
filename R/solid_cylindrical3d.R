@@ -69,7 +69,7 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Example: a quarter-twisted cup
 #' # R in [0, 1 + 0.2*cos(theta)],  z in [0, 1 + 0.5*r]
 #' R1 <- function(theta) 0
@@ -78,7 +78,7 @@
 #' Z2 <- function(r, theta) 1 + 0.5*r
 #' solid_cylindrical3d(
 #'   R1, R2, Z1, Z2, th_min = 0, th_max = pi/2,
-#'   plot = TRUE, mode = "both",
+#'   plot = FALSE, mode = "both",
 #'   colorscale = c("white", "#2a9d8f"), opacity = 0.35,
 #'   show_surface_grid = TRUE,
 #'   compute_volume = TRUE, vol_method = "adaptive"
@@ -352,21 +352,31 @@ solid_cylindrical3d <- function(
     Z2v <- Vectorize(Z2)
 
     if (vol_method == "adaptive") {
+
+      # NOTE: stats::integrate passes a VECTOR of theta values to the integrand.
+      # This wrapper makes the inner integral robust by evaluating it per scalar theta.
       inner_r <- function(theta) {
-        rL <- R1v(theta)
-        rU <- R2v(theta)
-        if (rU < rL) {
-          tmp <- rL; rL <- rU; rU <- tmp
-        }
-        if (!is.finite(rL) || !is.finite(rU) || rU <= rL) return(0)
-        g <- function(r) (Z2v(r, theta) - Z1v(r, theta)) * r
-        stats::integrate(g, lower = rL, upper = rU, rel.tol = 1e-6)$value
+        vapply(theta, function(th) {
+          rL <- R1v(th)
+          rU <- R2v(th)
+
+          if (rU < rL) {
+            tmp <- rL; rL <- rU; rU <- tmp
+          }
+          if (!is.finite(rL) || !is.finite(rU) || rU <= rL) return(0)
+
+          g <- function(r) (Z2v(r, th) - Z1v(r, th)) * r
+          stats::integrate(g, lower = rL, upper = rU, rel.tol = 1e-6)$value
+        }, numeric(1))
       }
+
       val <- stats::integrate(
         function(th) inner_r(th),
         lower = th_min, upper = th_max, rel.tol = 1e-6
       )$value
+
       volume <- list(estimate = val, method = "adaptive")
+
     } else {
       ths <- seq(th_min, th_max, length.out = ntheta_vol)
       dth <- (th_max - th_min) / (ntheta_vol - 1L)

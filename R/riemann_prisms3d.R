@@ -12,7 +12,7 @@
 #' \pkg{plotly}. Optionally, the actual surface \code{z = F(x, y)} can also be
 #' drawn over the rectangular bounding box that contains the region.
 #'
-#' @param F A function \code{F(x, y)} returning a numeric scalar.
+#' @param f A function \code{f(x, y)} returning a numeric scalar.
 #' @param a,b Numeric endpoints of the x-interval. Must satisfy \code{a < b}.
 #' @param f1,f2 Functions returning the lower and upper y-boundaries for each x.
 #'   The valid y-range at each x is the interval between the minimum and maximum
@@ -57,14 +57,14 @@
 #' }
 #'
 #' @examples
-#' F  <- function(x, y) x * y
+#' f  <- function(x, y) x * y
 #' f1 <- function(x) 0
 #' f2 <- function(x) 1 - x
-#' # riemann_prisms3d(F, f1, f2, 0, 1, N = 10, M = 10, plot = FALSE)
+#' riemann_prisms3d(f, f1, f2, 0, 1, N = 10, M = 10, plot = FALSE)
 #'
 #' @export
 riemann_prisms3d <- function(
-    F, f1, f2,
+    f, f1, f2,
     a, b, N, M,
     plot = TRUE,
     estimate = c("lower","upper","mean","all"),
@@ -126,8 +126,8 @@ riemann_prisms3d <- function(
   }
 
   # --- validation
-  if (!is.function(F) || !is.function(f1) || !is.function(f2)) {
-    stop("F, f1 and f2 must be functions.", call. = FALSE)
+  if (!is.function(f) || !is.function(f1) || !is.function(f2)) {
+    stop("f, f1 and f2 must be functions.", call. = FALSE)
   }
   if (!is.numeric(a) || !is.numeric(b) ||
       length(a) != 1L || length(b) != 1L ||
@@ -164,7 +164,7 @@ riemann_prisms3d <- function(
   eval_cell_stats <- function(x0, x1, y0, y1) {
     xs <- seq(x0, x1, length.out = sample_n + 1L)
     ys <- seq(y0, y1, length.out = sample_n + 1L)
-    Z  <- outer(ys, xs, function(yy, xx) F(xx, yy))
+    Z  <- outer(ys, xs, function(yy, xx) f(xx, yy))
     c(
       z_lower = min(Z, na.rm = TRUE),
       z_upper = max(Z, na.rm = TRUE),
@@ -278,7 +278,7 @@ riemann_prisms3d <- function(
         Ys <- matrix(rep(ys, times = nx), nrow = ny)
         Zs <- matrix(NA_real_, nrow = ny, ncol = nx)
         for (j in seq_len(nx)) {
-          Zs[, j] <- vapply(ys, function(yy) F(xs[j], yy), numeric(1))
+          Zs[, j] <- vapply(ys, function(yy) f(xs[j], yy), numeric(1))
         }
 
         contours_arg <- if (isTRUE(show_surface_grid)) list(

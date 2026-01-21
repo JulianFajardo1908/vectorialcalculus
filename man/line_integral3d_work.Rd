@@ -5,7 +5,7 @@
 \title{3D line integral with work visualization}
 \usage{
 line_integral3d_work(
-  F,
+  field,
   r,
   a,
   b,
@@ -23,7 +23,7 @@ line_integral3d_work(
 )
 }
 \arguments{
-\item{F}{Function that represents the vector field. It must be a function
+\item{field}{Function that represents the vector field. It must be a function
 of three or four numeric arguments. In the three argument form the
 arguments are x, y and z. In the four argument form the arguments are
 x, y, z and t. The function must return a numeric vector of length three.}
@@ -82,10 +82,18 @@ visualization of the curve together with arrows of the field.
 }
 \details{
 The parameter t runs from a to b. The curve r(t) must return a numeric
-vector of length three. The field F(x, y, z) may optionally also depend
+vector of length three. The field field(x, y, z) may optionally also depend
 on t through a fourth argument.
 }
 \examples{
-NULL
+\donttest{
+field <- function(x, y, z) c(-y, x, 0.2*z)
+r <- function(t) c(cos(t), sin(t), 0.25*t)
+out <- line_integral3d_work(
+  field = field, r = r, a = 0, b = 2*pi,
+  plot = FALSE, n_curve = 200, n_field = 5
+)
+out$value
+}
 
 }

@@ -66,7 +66,7 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' f <- function(x, y) x^2 + y^2
 #' critical_points_2d(f, xlim = c(-2, 2), ylim = c(-2, 2), plot = FALSE)
 #' }

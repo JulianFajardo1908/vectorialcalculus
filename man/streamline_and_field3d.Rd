@@ -5,7 +5,7 @@
 \title{Vector field and streamline in 3D (single combined figure)}
 \usage{
 streamline_and_field3d(
-  F,
+  field,
   H1,
   H2,
   G1,
@@ -16,7 +16,7 @@ streamline_and_field3d(
   NY = 6,
   NZ = 6,
   p,
-  T,
+  t_final,
   step,
   arrows = c("both", "line", "cone", "none"),
   arrow_scale = 0.08,
@@ -32,11 +32,12 @@ streamline_and_field3d(
   traj_marker_size = 2,
   scene = list(aspectmode = "data", xaxis = list(title = "x"), yaxis = list(title = "y"),
     zaxis = list(title = "z")),
-  bg = list(paper = "white", plot = "white")
+  bg = list(paper = "white", plot = "white"),
+  ...
 )
 }
 \arguments{
-\item{F}{A function representing the vector field. It can be given as
+\item{field}{A function representing the vector field. It can be given as
 \code{function(x, y, z)} or \code{function(x, y, z, t)}, and must
 return a numeric vector of length three \code{c(Fx, Fy, Fz)}.}
 
@@ -55,7 +56,7 @@ sampling density of the field in the three parameter directions.}
 \item{p}{Numeric vector of length three giving the initial point of
 the streamline, in the form \code{c(x0, y0, z0)}.}
 
-\item{T}{Final integration time for the streamline. A negative value
+\item{t_final}{Final integration time for the streamline. A negative value
 integrates backward in time.}
 
 \item{step}{Step size for the fixed-step RK4 integration. Must be
@@ -96,6 +97,8 @@ aspect mode and axis titles.}
 
 \item{bg}{List with background colors for the figure, typically with
 entries \code{paper} and \code{plot}.}
+
+\item{...}{Reserved for backward compatibility. Do not use.}
 }
 \value{
 A list with:
@@ -141,7 +144,7 @@ arrow length relative to the size of the domain.
 The streamline is defined as the trajectory of a particle whose
 velocity at each point is given by the vector field evaluated along
 the path. The field may optionally depend on time; if the function
-\code{F} has a time argument, it is used during integration. The
+\code{field} has a time argument, it is used during integration. The
 integration runs from time zero up to a final time, with positive or
 negative direction depending on the sign of the final time.
 
@@ -154,22 +157,22 @@ and end points.
 }
 }
 \examples{
-\dontshow{if (interactive()) \{}
+\donttest{
 H1 <- function(x) -1
 H2 <- function(x)  1
 G1 <- function(x, y) -0.5
 G2 <- function(x, y)  0.5
-F  <- function(x, y, z) c(-y, x, 0.6)
+field <- function(x, y, z) c(-y, x, 0.6)
 
-streamline_and_field3d(
-  F, H1, H2, G1, G2,
+out <- streamline_and_field3d(
+  field, H1, H2, G1, G2,
   a = -2, b = 2, NX = 10, NY = 8, NZ = 5,
-  p = c(1, 0, 0), T = 12, step = 0.02,
+  p = c(1, 0, 0), t_final = 2, step = 0.05,
   arrows = "both", arrow_scale = 0.12, normalize_bias = 1,
   normal_color = "rgba(0,0,0,0.55)", normal_width = 2,
   arrow_color  = "#1d3557", arrow_opacity = 0.95, arrow_size = 0.4,
   traj_color   = "#e63946", traj_width = 5, traj_markers = TRUE
 )
-\dontshow{\}}
+}
 
 }

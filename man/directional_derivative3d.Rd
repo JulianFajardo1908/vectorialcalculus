@@ -141,8 +141,8 @@ fine grid to produce a strip of the surface. It then overlays:
 f3 <- function(x, y, z) x^2 + y^2 + z
 directional_derivative3d(f3, x0 = c(1, 0, 0), v = c(1, 1, 0))
 
-# Two-dimensional example with plotting:
+# Two-dimensional example without plotting (fast, no plotly required):
 f2 <- function(x, y) x^2 + y^2
-# directional_derivative3d(f2, x0 = c(0, 0), v = c(1, 2), plot = TRUE)
+directional_derivative3d(f2, x0 = c(0, 0), v = c(1, 2), plot = FALSE)
 
 }

@@ -5,7 +5,7 @@
 \title{2D line integral of a vector field with visualization}
 \usage{
 line_integral_vector2d(
-  F,
+  field,
   r,
   a,
   b,
@@ -29,7 +29,7 @@ line_integral_vector2d(
 )
 }
 \arguments{
-\item{F}{Vector field in the plane. A function \code{function(x, y)} that
+\item{field}{Vector field in the plane. A function \code{function(x, y)} that
 returns a numeric vector of length 2 \code{c(Fx, Fy)}.}
 
 \item{r}{Parametric curve in the plane. A function \code{function(t)} that
@@ -100,7 +100,7 @@ otherwise \code{NULL}.
 }
 \description{
 This function computes a numerical approximation of the line integral
-of a planar vector field F along a parametric curve r(t) on the interval
+of a planar vector field along a parametric curve r(t) on the interval
 from a to b. The derivative of the curve is approximated by finite
 differences and the integral is evaluated either by an adaptive numerical
 integrator or by a composite Simpson rule.
@@ -108,15 +108,15 @@ integrator or by a composite Simpson rule.
 \details{
 Optionally, the function can build an interactive \pkg{plotly} figure that
 shows a grid of arrows for the vector field and the curve colored by the
-local power F(r(t)) * r'(t).
+local power field(r(t)) * r'(t).
 }
 \examples{
 # Simple example:
-# F(x, y) = (y, -x), r(t) = (cos t, sin t), t in [0, 2*pi]
-# line_integral_vector2d(
-#   F = function(x, y) c(y, -x),
-#   r = function(t) c(cos(t), sin(t)),
-#   a = 0, b = 2*pi, plot = FALSE
-# )
+# field(x, y) = (y, -x), r(t) = (cos t, sin t), t in [0, 2*pi]
+line_integral_vector2d(
+  field = function(x, y) c(y, -x),
+  r = function(t) c(cos(t), sin(t)),
+  a = 0, b = 2*pi, plot = FALSE
+)
 
 }

@@ -69,7 +69,7 @@
 #' X <- function(t) cos(t)
 #' Y <- function(t) sin(t)
 #' Z <- function(t) 0.2 * t
-#' # osculating_ribbon3d(X, Y, Z, a = 0, b = 4*pi, plot = TRUE)
+#' osculating_ribbon3d(X, Y, Z, a = 0, b = 4*pi, plot = FALSE)
 #'
 #' @export
 osculating_ribbon3d <- function(

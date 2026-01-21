@@ -54,11 +54,11 @@ data <- curve_sample3d(
   function(t) t / 5,
   0, 2 * pi, 100
 )
-# \donttest{
-# if (requireNamespace("plotly", quietly = TRUE)) {
-#   plot_curve3d(data, line = list(color = "red", width = 4))
-# }
-# }
+\donttest{
+if (requireNamespace("plotly", quietly = TRUE)) {
+  plot_curve3d(data, line = list(color = "red", width = 4))
+}
+}
 
 }
 \seealso{

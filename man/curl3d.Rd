@@ -4,10 +4,10 @@
 \alias{curl3d}
 \title{Numerical curl of a three-dimensional vector field}
 \usage{
-curl3d(F, x, y, z, h = NULL, tval = 0, method = c("central"))
+curl3d(field, x, y, z, h = NULL, tval = 0, method = c("central"))
 }
 \arguments{
-\item{F}{A function representing the vector field. It can be defined
+\item{field}{A function representing the vector field. It can be defined
 as \code{function(x, y, z)} or as \code{function(x, y, z, t)}.
 It must return a numeric vector \code{c(Fx, Fy, Fz)}.}
 
@@ -61,14 +61,14 @@ sensitivity to floating-point error.
 }
 \examples{
 # Simple rotating field: curl is constant in the third component
-F1 <- function(x, y, z) c(-y, x, 0.6)
-curl3d(F1, x = 0.1, y = -0.3, z = 2)
+field1 <- function(x, y, z) c(-y, x, 0.6)
+curl3d(field1, x = 0.1, y = -0.3, z = 2)
 
 # Time-dependent example (time does not affect the curl):
-F2 <- function(x, y, z, t) c(-y, x + t, z)
-curl3d(F2, x = 1, y = 2, z = 3, tval = 5)
+field2 <- function(x, y, z, t) c(-y, x + t, z)
+curl3d(field2, x = 1, y = 2, z = 3, tval = 5)
 
 # Using a smaller step size for more precision:
-curl3d(F1, x = 1, y = 1, z = 1, h = 1e-5)
+curl3d(field1, x = 1, y = 1, z = 1, h = 1e-5)
 
 }

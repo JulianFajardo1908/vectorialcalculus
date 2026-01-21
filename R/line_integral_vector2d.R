@@ -1,16 +1,16 @@
 #' 2D line integral of a vector field with visualization
 #'
 #' This function computes a numerical approximation of the line integral
-#' of a planar vector field F along a parametric curve r(t) on the interval
+#' of a planar vector field along a parametric curve r(t) on the interval
 #' from a to b. The derivative of the curve is approximated by finite
 #' differences and the integral is evaluated either by an adaptive numerical
 #' integrator or by a composite Simpson rule.
 #'
 #' Optionally, the function can build an interactive \pkg{plotly} figure that
 #' shows a grid of arrows for the vector field and the curve colored by the
-#' local power F(r(t)) * r'(t).
+#' local power field(r(t)) * r'(t).
 #'
-#' @param F Vector field in the plane. A function \code{function(x, y)} that
+#' @param field Vector field in the plane. A function \code{function(x, y)} that
 #'   returns a numeric vector of length 2 \code{c(Fx, Fy)}.
 #' @param r Parametric curve in the plane. A function \code{function(t)} that
 #'   returns a numeric vector of length 2 \code{c(x, y)}.
@@ -61,16 +61,16 @@
 #'
 #' @examples
 #' # Simple example:
-#' # F(x, y) = (y, -x), r(t) = (cos t, sin t), t in [0, 2*pi]
-#' # line_integral_vector2d(
-#' #   F = function(x, y) c(y, -x),
-#' #   r = function(t) c(cos(t), sin(t)),
-#' #   a = 0, b = 2*pi, plot = FALSE
-#' # )
+#' # field(x, y) = (y, -x), r(t) = (cos t, sin t), t in [0, 2*pi]
+#' line_integral_vector2d(
+#'   field = function(x, y) c(y, -x),
+#'   r = function(t) c(cos(t), sin(t)),
+#'   a = 0, b = 2*pi, plot = FALSE
+#' )
 #'
 #' @export
 line_integral_vector2d <- function(
-    F, r, a, b,
+    field, r, a, b,
     plot = TRUE,
     n_curve = 600,
     grid_n  = 15,
@@ -95,7 +95,7 @@ line_integral_vector2d <- function(
 ){
   method <- match.arg(method)
 
-  if (!is.function(F)) stop("'F' must be function(x, y) -> c(Fx, Fy).", call. = FALSE)
+  if (!is.function(field)) stop("'field' must be function(x, y) -> c(Fx, Fy).", call. = FALSE)
   if (!is.function(r)) stop("'r' must be function(t) -> c(x, y).", call. = FALSE)
   if (!is.numeric(a) || !is.numeric(b) ||
       length(a) != 1L || length(b) != 1L ||
@@ -112,10 +112,10 @@ line_integral_vector2d <- function(
     as.numeric(out)
   }
 
-  eval_F <- function(x, y) {
-    out <- F(x, y)
+  eval_field <- function(x, y) {
+    out <- field(x, y)
     if (!is.numeric(out) || length(out) != 2L || any(!is.finite(out))) {
-      stop("F(x, y) must return a finite numeric vector of length 2.", call. = FALSE)
+      stop("field(x, y) must return a finite numeric vector of length 2.", call. = FALSE)
     }
     as.numeric(out)
   }
@@ -144,8 +144,8 @@ line_integral_vector2d <- function(
     (eval_r(t2) - eval_r(t1)) / (t2 - t1)
   }
 
-  # Power density p(t) = F(r(t)) · r'(t)
-  Fr <- t(vapply(seq_along(tt), function(i) eval_F(xs[i], ys[i]), numeric(2)))
+  # Power density p(t) = field(r(t)) · r'(t)
+  Fr <- t(vapply(seq_along(tt), function(i) eval_field(xs[i], ys[i]), numeric(2)))
   rp <- t(vapply(tt, rprime, numeric(2)))
   speed <- sqrt(rowSums(rp^2))
   power <- rowSums(Fr * rp)
@@ -154,7 +154,7 @@ line_integral_vector2d <- function(
   integrand <- function(t) {
     p  <- eval_r(t)
     v  <- rprime(t)
-    fv <- eval_F(p[1], p[2])
+    fv <- eval_field(p[1], p[2])
     sum(fv * v)
   }
   integrand_vec <- Vectorize(integrand, "t")
@@ -188,7 +188,7 @@ line_integral_vector2d <- function(
 
   grid_pts <- expand.grid(x = gx, y = gy)
   Fgrid    <- t(vapply(seq_len(nrow(grid_pts)),
-                       function(i) eval_F(grid_pts$x[i], grid_pts$y[i]),
+                       function(i) eval_field(grid_pts$x[i], grid_pts$y[i]),
                        numeric(2)))
   mag <- sqrt(rowSums(Fgrid^2))
 

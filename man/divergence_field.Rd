@@ -4,10 +4,10 @@
 \alias{divergence_field}
 \title{Numerical divergence of a vector field}
 \usage{
-divergence_field(F, x0, h = NULL, plot = FALSE)
+divergence_field(field, x0, h = NULL, plot = FALSE)
 }
 \arguments{
-\item{F}{Function of the form \code{F(x)} returning a numeric vector
+\item{field}{Function of the form \code{field(x)} returning a numeric vector
 of the same length as \code{x}.}
 
 \item{x0}{Numeric vector giving the evaluation point.}
@@ -28,7 +28,7 @@ A numeric scalar: the divergence evaluated at \code{x0}.
 }
 \description{
 Computes the divergence of a vector field at a given point using
-central finite differences. The vector field \code{F} must take a
+central finite differences. The vector field \code{field} must take a
 numeric vector \code{x} and return a numeric vector of the same length.
 }
 \details{
@@ -36,7 +36,7 @@ Optionally, if the dimension is 2 or 3 and \code{plot = TRUE},
 a simple visualization is produced using \pkg{plotly}.
 }
 \examples{
-F <- function(x) c(x[1] + x[2], x[2] - x[1])
-divergence_field(F, c(0.5, -0.2))
+field <- function(x) c(x[1] + x[2], x[2] - x[1])
+divergence_field(field, c(0.5, -0.2))
 
 }
