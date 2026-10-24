@@ -107,9 +107,9 @@ curvature_torsion3d <- function(
   d1 <- function(f, t, h) (f(t + h) - f(t - h)) / (2 * h)
   d2 <- function(f, t, h) (f(t + h) - 2 * f(t) + f(t - h)) / (h * h)
   # Third derivative, centered finite difference (step h):
-  # f'''(t) \u2248 (f(t-2h) - 2f(t-h) + 2f(t+h) - f(t+2h)) / (2 h^3)
-  d3 <- function(f, t, h) (f(t - 2 * h) - 2 * f(t - h) +
-                             2 * f(t + h) - f(t + 2 * h)) / (2 * h^3)
+  # f'''(t) ~= (-f(t-2h) + 2f(t-h) - 2f(t+h) + f(t+2h)) / (2 h^3)
+  d3 <- function(f, t, h) (-f(t - 2 * h) + 2 * f(t - h) -
+                             2 * f(t + h) + f(t + 2 * h)) / (2 * h^3)
 
   r  <- function(t) c(X(t), Y(t), Z(t))
   r1 <- c(d1(X, t0, h), d1(Y, t0, h), d1(Z, t0, h))
