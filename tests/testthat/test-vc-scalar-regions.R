@@ -55,6 +55,7 @@ test_that("planar Type I and II regions describe the same triangle", {
   b <- type2(c(0, 1), function(y) 0, function(y) 1 - y)
   both <- type3(a, b)
   expect_identical(both$equivalence, "unverified")
+  expect_s3_class(both, "vc_region_type1")
   expect_true(contains(a, c(0.2, 0.3)))
   expect_true(contains(b, c(0.2, 0.3)))
   expect_true(contains(both, c(0.2, 0.3)))
@@ -62,7 +63,7 @@ test_that("planar Type I and II regions describe the same triangle", {
   expect_error(contains(a, c(-0.1, 0.2)), NA)
 })
 
-test_that("Type III refuses incompatible descriptions at queried points", {
+test_that("Type III uses Type I membership even if supplementary Type II differs", {
   type1 <- vectorialcalculus:::.vc_new_region_type1
   type2 <- vectorialcalculus:::.vc_new_region_type2
   type3 <- vectorialcalculus:::.vc_new_region_type3
@@ -71,7 +72,8 @@ test_that("Type III refuses incompatible descriptions at queried points", {
   a <- type1(c(0, 1), function(x) 0, function(x) 1 - x)
   b <- type2(c(0, 1), function(y) 0, function(y) 1)
   both <- type3(a, b)
-  expect_error(contains(both, c(0.8, 0.8)), "disagree")
+  expect_false(contains(both, c(0.8, 0.8)))
+  expect_identical(both$equivalence, "unverified")
 })
 
 test_that("inverted planar boundaries are not silently integrated", {
