@@ -153,17 +153,15 @@
   # Arbitrary R boundary functions cannot generally be proven equivalent.
   structure(
     list(by_x = by_x, by_y = by_y,
+         xlim = by_x$xlim, lower = by_x$lower, upper = by_x$upper,
          dimension = 2L, equivalence = "unverified"),
-    class = c("vc_region_type3", "vc_region")
+    class = c("vc_region_type3", "vc_region_type1", "vc_region")
   )
 }
 
 .vc_region_contains.vc_region_type3 <- function(region, at, ...) {
-  a <- .vc_region_contains(region$by_x, at)
-  b <- .vc_region_contains(region$by_y, at)
-  if (!identical(a, b)) {
-    stop("Type III representations disagree at the queried point.",
-         call. = FALSE)
-  }
-  a
+  # Type III inherits Type I: membership uses its designated Type I
+  # representation. The Type II representation is supplementary metadata.
+  # Its equivalence remains unverified unless separately established.
+  .vc_region_contains.vc_region_type1(region, at)
 }
