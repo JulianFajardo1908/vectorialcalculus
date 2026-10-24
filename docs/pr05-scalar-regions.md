@@ -12,8 +12,8 @@ This PR builds on PR-04 and, transitively, PR-02. All new functions are **intern
 ## Mathematical contract
 - Domain and study must be dimensionally compatible and satisfy exact box inclusion.
 - Evaluating inside the mathematical domain but outside study remains permitted.
-- A Type III region is not automatically declared equivalent just because both descriptions exist.
-- Membership in a Type III region compares both descriptions **at the queried point** and errors if they disagree. Agreement at a finite number of points does not prove global equivalence.
+- A Type III region inherits Type I for classification and membership. Its Type II description is retained as supplementary information; no global equivalence is asserted.
+- Membership in a Type III region is determined by its Type I representation. The supplementary Type II representation is not required to agree during evaluation. Agreement at finitely many points would not prove global equivalence.
 - Planar boundaries are checked at query points, not proven ordered for every real argument. Integration is **not** implemented yet.
 - Nonfinite scalar outputs and points outside known domains are rejected.
 
@@ -22,7 +22,7 @@ This PR builds on PR-04 and, transitively, PR-02. All new functions are **intern
 - Scalar fields with vector/coordinate function signatures.
 - Inclusion of study in a partially open box.
 - Membership in a triangle represented by Type I, II and III.
-- Detection of disagreement between Type III descriptions.
+- Type III inheritance from Type I and independence of supplementary Type II membership.
 - Rejection of inverted boundaries at a queried point.
 
 ## Explicit limitations
